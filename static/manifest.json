@@ -1,0 +1,7 @@
+{
+	"name": "Music Manager",
+	"short_name": "Music",
+	"icons": [],
+	"start_url": "/",
+	"display": "standalone"
+}
