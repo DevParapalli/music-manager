@@ -22,7 +22,7 @@
 
 body {
 	/*All content is inside this anyway. Base Text */
-	@apply text-nord4 font-medium bg-nord2 m-0 p-0;
+	@apply text-nord5 font-medium bg-nord2 m-0 p-0;
 	font-family: 'Quicksand', sans-serif;
 }
 
@@ -49,6 +49,6 @@ body::-webkit-scrollbar-thumb {
 	width: 0;
 	height: 100%;
 	transition: height .3s;
-	background: theme('colors.nord10');
+	background: theme('colors.nord15');
   }
 

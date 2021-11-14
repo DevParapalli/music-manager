@@ -9,34 +9,25 @@
 	//					.replace(/[^\w-]+/g, '')}
 
 	import { onMount } from 'svelte';
+	import { fade } from 'svelte/transition';
 	import { get } from 'svelte/store';
-	import { appWindow } from '@tauri-apps/api/window';
-	import { pageTitle } from '../../stores/store';
-	import HiddenPlayer from '$lib/ui/HiddenPlayer.svelte';
+	//import { appWindow } from '@tauri-apps/api/window';
+	import { pageTitle, current_value } from '../../stores/store';
+	import nanobar from 'nanobar';
 
 	onMount(async () => {
-		appWindow.setTitle(get(pageTitle));
-		pageTitle.subscribe((title) => {
-			appWindow.setTitle(title);
-		});
+		//current_value.subscribe((value) => {
+		//		progressBar.go(Number(value));
+		//	});
+		//appWindow.setTitle(get(pageTitle));
+		//pageTitle.subscribe((title) => {
+		//appWindow.setTitle(title);
+		//});
 	});
-
-	/*
-	import nanobar from 'nanobar';
-	let progressBar = new nanobar({
-		id: 'progress-bar',
-		classname: 'progress-bar'
-	});
-	import {current_value} from '../../stores/store';
-	current_value.subscribe((value) => {
-		progressBar.go(Number(value));
-	});
-	
-*/
 
 	// Plyr Stuff
 	import { Plyr } from 'svelte-plyr';
-	export let player;
+	let player;
 	let altsource = {
 		type: 'audio',
 		sources: [
@@ -46,6 +37,47 @@
 			}
 		]
 	};
+
+	// Plyr Integration Stuff.
+	let eventsEmitted = ['timeupdate', 'play', 'pause', 'ready'];
+	let progressBar;
+	// Play/Pause
+	$: isPlaying = false;
+	function play(event) {
+		//console.log(event)
+		isPlaying = true;
+	}
+	function pause(event) {
+		//console.log(event)
+		isPlaying = false;
+	}
+	// Function for updating elements based on time.
+	function timeupdate(event) {
+		//console.table(event.detail)
+		//console.log(progressBar)
+		progressBar.go(Number(event.detail.currentTime / event.detail.duration)*100);
+	}
+	// create ProgressBar when the player is ready.
+	function ready(event) {
+		progressBar = new nanobar({
+			classname: 'progress-bar',
+			target: document.getElementById('progress-bar')
+		});
+		//console.log('%c [plyr] Player Ready ', 'background-color: green; text-color: white')
+	}
+	// Handle clicks for timeskip.
+	function handle_timeskip_click(event) {
+		let bar = document.getElementById('progress-bar')
+		let x = event.pageX - bar.offsetLeft
+		let y = event.pageY - bar.offsetTop
+		let clickedValue = x * 1 / bar.offsetWidth
+		//console.table({'x':x, 'y':y, 'value':clickedValue})
+		if (player) {
+			let newDuration = clickedValue * player.duration
+			player.currentTime = newDuration
+			//console.log(newDuration, clickedValue, player.duration)
+		}
+	}
 </script>
 
 <div class="flex flex-col">
@@ -64,7 +96,7 @@
 				<div class="mt-4">
 					<ul>
 						<li class="py-2 text-center hover:bg-nord2">
-							<a href="/" on:click|preventDefault={() => player.togglePlay()}>
+							<a href="/">
 								<span class="h-5 w-5 mx-auto text-nord4 inline-block transition-colors duration-200"
 									><img
 										src="https://api.iconify.design/fe/play.svg?color=%23d8dee9"
@@ -131,10 +163,17 @@
 			<slot />
 		</div>
 	</div>
-	<div class="flex flex-colself-center w-full h-24 align-middle">
+	<div id="player" class="flex flex-col self-center w-full h-24 align-middle select-none">
+		<div id="progress-bar" on:click={handle_timeskip_click}>
+			<!--
+				<div class="nanobar progress-bar" style="position: relative;">
+					<div class="bar" style="width: 10%;"></div>
+				</div>
+			-->
+		</div>
 		<ul class="flex flex-1 flex-row items-center h-20">
 			<li class="flex pl-4">
-				<span id="skip-previous" class="p-4 cursor-pointer ">
+				<span id="skip-previous" class="p-4 cursor-pointer rounded-full">
 					<svg
 						class="h-8 w-8"
 						xmlns="http://www.w3.org/2000/svg"
@@ -146,7 +185,12 @@
 						><path d="M6 18V6h2v12H6m3.5-6L18 6v12l-8.5-6z" fill="currentColor" /></svg
 					>
 				</span>
-				<span id="playback-toggle" class="p-4 cursor-pointer">
+				<span
+					id="playback-toggle"
+					class="p-4 cursor-pointer rounded-full hover:text-nord6 hover:shadow-md hover:bg-nord3 active:bg-nord1"
+					transition:fade
+					on:click|preventDefault={() => player.togglePlay()}
+				>
 					<svg
 						class="h-8 w-8"
 						xmlns="http://www.w3.org/2000/svg"
@@ -154,10 +198,14 @@
 						aria-hidden="true"
 						role="img"
 						preserveAspectRatio="xMidYMid meet"
-						viewBox="0 0 24 24"><path d="M14 19h4V5h-4M6 19h4V5H6v14z" fill="currentColor" /></svg
+						viewBox="0 0 24 24"
+						><path
+							d={isPlaying ? 'M14 19h4V5h-4M6 19h4V5H6v14z' : 'M8 5.14v14l11-7l-11-7z'}
+							fill="currentColor"
+						/></svg
 					>
 				</span>
-				<span id="skip-next" class="p-4 cursor-pointer">
+				<span id="skip-next" class="p-4 cursor-pointer rounded-full">
 					<svg
 						class="h-8 w-8"
 						xmlns="http://www.w3.org/2000/svg"
@@ -171,12 +219,11 @@
 				</span>
 			</li>
 			<li class="pl-8 pr-4">
-				<span class="max-h-16 max-w-16" >
+				<span class="max-h-16 max-w-16">
 					<img class="rounded" src="https://dummyimage.com/64x64" alt="Album Art" />
-					</span
-				>
+				</span>
 			</li>
-			<li class="flex-grow-[2] px-4 text-left flex flex-col">
+			<li class="flex-grow-[2] px-4 text-left flex flex-col select-text">
 				<span>SONG NAME?</span>
 				<span>ARTIST NAME | ALBUM NAME</span>
 			</li>
@@ -184,7 +231,7 @@
 				<span>REPEAT</span>
 				<span>SHUFFLE</span>
 				<span>VOLUME CONTROLS ??</span>
-				<span></span>
+				<span />
 				<span>TIME / LEFT</span>
 			</li>
 		</ul>
@@ -192,7 +239,14 @@
 </div>
 
 <div class="hidden">
-	<Plyr bind:player>
+	<Plyr
+		bind:player
+		on:ready={ready}
+		on:timeupdate={timeupdate}
+		on:play={play}
+		on:pause={pause}
+		eventsToEmit={eventsEmitted}
+	>
 		<audio crossorigin="" playsinline>
 			<source
 				src="https://cors-anywhere.herokuapp.com/https://cdn.plyr.io/static/demo/Kishi_Bashi_-_It_All_Began_With_a_Burst.mp3"
