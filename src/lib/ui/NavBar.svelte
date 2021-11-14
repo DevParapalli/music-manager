@@ -39,10 +39,11 @@
 	};
 
 	// Plyr Integration Stuff.
-	let eventsEmitted = ['timeupdate', 'play', 'pause', 'ready'];
-	let progressBar;
+	let eventsEmitted = ['timeupdate', 'play', 'pause', 'ready', 'progress'];
+	let progressBar, bufferBar;
 	// Play/Pause
 	$: isPlaying = false;
+
 	function play(event) {
 		//console.log(event)
 		isPlaying = true;
@@ -55,47 +56,59 @@
 	function timeupdate(event) {
 		//console.table(event.detail)
 		//console.log(progressBar)
-		progressBar.go(Number(event.detail.currentTime / event.detail.duration)*100);
+		//handle_progress(event);
+
+		progressBar.go(Number(event.detail.currentTime / event.detail.duration) * 100);
 	}
 	// create ProgressBar when the player is ready.
 	function ready(event) {
+		let playerProgress = document.getElementById('progress-bar');
+		// Setup Main Progress Bar
 		progressBar = new nanobar({
 			classname: 'progress-bar',
-			target: document.getElementById('progress-bar')
+			target: playerProgress
 		});
+		// Setup BufferProgressBar
+		//bufferBar = document.createElement('div');
+		//bufferBar.classList.add('buffer-bar');
+		//bufferBar['go'] = (percent) => (bufferBar.style.width = `${percent}%`);
 		//console.log('%c [plyr] Player Ready ', 'background-color: green; text-color: white')
 	}
 	// Handle clicks for timeskip.
 	function handle_timeskip_click(event) {
-		let bar = document.getElementById('progress-bar')
-		let x = event.pageX - bar.offsetLeft
-		let y = event.pageY - bar.offsetTop
-		let clickedValue = x * 1 / bar.offsetWidth
+		let bar = document.getElementById('progress-bar');
+		let x = event.pageX - bar.offsetLeft;
+		let y = event.pageY - bar.offsetTop;
+		let clickedValue = (x * 1) / bar.offsetWidth;
 		//console.table({'x':x, 'y':y, 'value':clickedValue})
 		if (player) {
-			let newDuration = clickedValue * player.duration
-			player.currentTime = newDuration
+			let newDuration = clickedValue * player.duration;
+			player.currentTime = newDuration;
 			//console.log(newDuration, clickedValue, player.duration)
 		}
 	}
+	// Progress timeskip
+	//function handle_progress(event) {
+	//	console.log(event.detail.buffered);
+	//}
 </script>
 
 <div class="flex flex-col">
 	<div class="flex flex-row">
-		<nav class="bg-nord0 w-12 h-auto justify-between flex flex-col">
+		<nav class="bg-nord0 w-16 h-auto justify-between flex flex-col">
 			<div class="mt-4 mb-10">
-				<a href="/profile" class="hover:bg-nord3">
+				<a href="/profile" class="hover:bg-nord3 hidden">
 					<img
 						src="data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAAUA
 					AAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO
 						9TXL0Y4OHwAAAABJRU5ErkJggg=="
-						class="rounded-full w-12 h-12 mb-3 mx-auto border-2 border-nord3 hover:bg-nord2"
+						class="rounded-full w-16 h-16 mb-3 mx-auto border-2 border-nord3 hover:bg-nord2"
 						alt="indenticon"
 					/>
 				</a>
 				<div class="mt-4">
 					<ul>
-						<li class="py-2 text-center hover:bg-nord2">
+						<li class="py-2 text-center hover:bg-nord2 rounded">
 							<a href="/">
 								<span class="h-5 w-5 mx-auto text-nord4 inline-block transition-colors duration-200"
 									><img
@@ -142,7 +155,7 @@
 					</ul>
 				</div>
 			</div>
-			<div class="mb-8 ml-2">
+			<div class="mb-8 mx-3">
 				<span on:click|preventDefault={navigate_back} class="h-12 w-12">
 					<!--Back Button, bottom of the sidebar-->
 					<svg
@@ -224,14 +237,23 @@
 				</span>
 			</li>
 			<li class="flex-grow-[2] px-4 text-left flex flex-col select-text">
-				<span>SONG NAME?</span>
+				<span>SONG NAME</span>
 				<span>ARTIST NAME | ALBUM NAME</span>
 			</li>
-			<li class="flex-grow-[1]">
-				<span>REPEAT</span>
-				<span>SHUFFLE</span>
+			<li class="flex-grow-[1] flex flex-row">
+				<span>
+					<svg
+						class="h-8 w-8"
+						xmlns="http://www.w3.org/2000/svg"
+						xmlns:xlink="http://www.w3.org/1999/xlink"
+						aria-hidden="true"
+						role="img"
+						preserveAspectRatio="xMidYMid meet"
+						viewBox="0 0 24 24"
+						><path d="M14.83 13.41l-1.41 1.41l3.13 3.13L14.5 20H20v-5.5l-2.04 2.04l-3.13-3.13M14.5 4l2.04 2.04L4 18.59L5.41 20L17.96 7.46L20 9.5V4m-9.41 5.17L5.41 4L4 5.41l5.17 5.17l1.42-1.41z" fill="currentColor" /></svg
+					>
+				</span>
 				<span>VOLUME CONTROLS ??</span>
-				<span />
 				<span>TIME / LEFT</span>
 			</li>
 		</ul>
