@@ -10,4 +10,7 @@ export const currentStatus = writable({
 	file: '//path/to/file'
 });
 
-export const current_value = writable("10");
+
+export const Queue = writable([]);
+
+

@@ -12,7 +12,7 @@
 	import { fade } from 'svelte/transition';
 	import { get } from 'svelte/store';
 	//import { appWindow } from '@tauri-apps/api/window';
-	import { pageTitle, current_value } from '../../stores/store';
+	import { pageTitle, Queue } from '../../stores/store';
 	import nanobar from 'nanobar';
 
 	onMount(async () => {
@@ -27,6 +27,7 @@
 
 	// Plyr Stuff
 	import { Plyr } from 'svelte-plyr';
+	import VolumeSlider from './VolumeSlider.svelte';
 	let player;
 	let altsource = {
 		type: 'audio',
@@ -53,11 +54,23 @@
 		isPlaying = false;
 	}
 	// Function for updating elements based on time.
+	let currentTime, duration;
 	function timeupdate(event) {
 		//console.table(event.detail)
 		//console.log(progressBar)
 		//handle_progress(event);
-
+		let currentMinutes = Math.floor(event.detail.currentTime / 60);
+		let currentSeconds = Math.floor(event.detail.currentTime - currentMinutes * 60);
+		currentTime = `
+		${currentMinutes < 10 ? '0' + currentMinutes : currentMinutes} : 
+		${currentSeconds < 10 ? '0' + currentSeconds : currentSeconds}
+		`;
+		let durationMinutes = Math.floor(event.detail.duration / 60);
+		let durationSeconds = Math.floor(event.detail.duration - durationMinutes * 60);
+		duration = `
+		${(durationMinutes < 10) ? '0' + durationMinutes : durationMinutes} : 
+		${(durationSeconds < 10) ? '0' + durationSeconds : durationSeconds}
+		`;
 		progressBar.go(Number(event.detail.currentTime / event.detail.duration) * 100);
 	}
 	// create ProgressBar when the player is ready.
@@ -91,6 +104,57 @@
 	//function handle_progress(event) {
 	//	console.log(event.detail.buffered);
 	//}
+	// Process Volume
+	let volume;
+	function handle_volume_change(volume) {
+		//console.log(volume)
+		if (player) {
+			player.volume = volume / 100;
+			//console.log(player.volume)
+		}
+		//volume = event.detail.volume;
+	}
+	$: handle_volume_change(volume);
+
+	// Keyboard Shortcuts for Player
+	function handle_keypress(event) {
+		if (event.ctrlKey ||  event.altKey) {
+			return;
+		}
+		event.preventDefault();
+		//console.log(event)
+		if (player) {
+			switch (event.key) {
+				case 'k':
+					player.togglePlay();
+					break;
+				case 'l':
+					// Skip to Next Song
+					break;
+				case 'j':
+					// Skip to Previous Song
+					break;
+				case 'i':
+					// Shuffle Queue
+					break;
+				case 'ArrowLeft':
+					player.currentTime -= 5;
+					break;
+				case 'ArrowRight':
+					player.currentTime += 5;
+					break;
+				case 'ArrowUp':
+					volume += 10;
+					break;
+				case 'ArrowDown':
+					volume -= 10;
+					break;
+				default:
+					break;
+			}
+		}
+	}
+
 </script>
 
 <div class="flex flex-col">
@@ -186,7 +250,7 @@
 		</div>
 		<ul class="flex flex-1 flex-row items-center h-20">
 			<li class="flex pl-4">
-				<span id="skip-previous" class="p-4 cursor-pointer rounded-full">
+				<span id="skip-previous" class="p-4 cursor-pointer rounded-full hover:text-nord6 hover:shadow-md hover:bg-nord3 active:bg-nord1">
 					<svg
 						class="h-8 w-8"
 						xmlns="http://www.w3.org/2000/svg"
@@ -218,7 +282,7 @@
 						/></svg
 					>
 				</span>
-				<span id="skip-next" class="p-4 cursor-pointer rounded-full">
+				<span id="skip-next" class="p-4 cursor-pointer rounded-full hover:text-nord6 hover:shadow-md hover:bg-nord3 active:bg-nord1">
 					<svg
 						class="h-8 w-8"
 						xmlns="http://www.w3.org/2000/svg"
@@ -243,18 +307,24 @@
 			<li class="flex-grow-[1] flex flex-row">
 				<span>
 					<svg
-						class="h-8 w-8"
+						class="h-7 w-7 mx-4"
 						xmlns="http://www.w3.org/2000/svg"
 						xmlns:xlink="http://www.w3.org/1999/xlink"
 						aria-hidden="true"
 						role="img"
 						preserveAspectRatio="xMidYMid meet"
 						viewBox="0 0 24 24"
-						><path d="M14.83 13.41l-1.41 1.41l3.13 3.13L14.5 20H20v-5.5l-2.04 2.04l-3.13-3.13M14.5 4l2.04 2.04L4 18.59L5.41 20L17.96 7.46L20 9.5V4m-9.41 5.17L5.41 4L4 5.41l5.17 5.17l1.42-1.41z" fill="currentColor" /></svg
+						><path
+							d="M14.83 13.41l-1.41 1.41l3.13 3.13L14.5 20H20v-5.5l-2.04 2.04l-3.13-3.13M14.5 4l2.04 2.04L4 18.59L5.41 20L17.96 7.46L20 9.5V4m-9.41 5.17L5.41 4L4 5.41l5.17 5.17l1.42-1.41z"
+							fill="currentColor"
+						/></svg
 					>
 				</span>
-				<span>VOLUME CONTROLS ??</span>
-				<span>TIME / LEFT</span>
+				<span class="px-2">
+					<!--Volume Slider-->
+					<VolumeSlider bind:value={volume} />
+				</span>
+				<span class="text-gray-400 text-sm">{currentTime || '00:00'} / {duration || '00:00'}</span>
 			</li>
 		</ul>
 	</div>
@@ -281,3 +351,5 @@
 		</audio>
 	</Plyr>
 </div>
+
+<svelte:window on:keydown="{handle_keypress}" />
