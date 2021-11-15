@@ -33,7 +33,7 @@
 		type: 'audio',
 		sources: [
 			{
-				src: 'https://cors-anywhere.herokuapp.com/https://www.bensound.com/bensound-music/bensound-betterdays.mp3',
+				src: 'Different Heaven & EH!DE - My Heart [NCS Release].mp3',
 				type: 'audio/mp3'
 			}
 		]
@@ -52,6 +52,15 @@
 	function pause(event) {
 		//console.log(event)
 		isPlaying = false;
+	}
+	// Skip to Next Source
+	function next(event) {
+		//console.log(event)
+		player.source = altsource;
+		// Reset Play Toggle to Paused
+		isPlaying = false;
+		// Reset Time Progress Bar to 0.
+		progressBar.go(0);
 	}
 	// Function for updating elements based on time.
 	let currentTime, duration;
@@ -73,14 +82,19 @@
 		`;
 		progressBar.go(Number(event.detail.currentTime / event.detail.duration) * 100);
 	}
-	// create ProgressBar when the player is ready.
+	// create ProgressBar when the player is ready and only get ready once.
+	let isReady = false;
 	function ready(event) {
+		if (isReady) {
+			return;
+		}
 		let playerProgress = document.getElementById('progress-bar');
 		// Setup Main Progress Bar
 		progressBar = new nanobar({
 			classname: 'progress-bar',
 			target: playerProgress
 		});
+		isReady = true;
 		// Setup BufferProgressBar
 		//bufferBar = document.createElement('div');
 		//bufferBar.classList.add('buffer-bar');
@@ -129,7 +143,7 @@
 					player.togglePlay();
 					break;
 				case 'l':
-					// Skip to Next Song
+					next();
 					break;
 				case 'j':
 					// Skip to Previous Song
@@ -154,6 +168,7 @@
 			}
 		}
 	}
+
 
 </script>
 
@@ -282,7 +297,7 @@
 						/></svg
 					>
 				</span>
-				<span id="skip-next" class="p-4 cursor-pointer rounded-full hover:text-nord6 hover:shadow-md hover:bg-nord3 active:bg-nord1">
+				<span id="skip-next" on:click="{() => next()}" class="p-4 cursor-pointer rounded-full hover:text-nord6 hover:shadow-md hover:bg-nord3 active:bg-nord1">
 					<svg
 						class="h-8 w-8"
 						xmlns="http://www.w3.org/2000/svg"
@@ -341,12 +356,8 @@
 	>
 		<audio crossorigin="" playsinline>
 			<source
-				src="https://cors-anywhere.herokuapp.com/https://cdn.plyr.io/static/demo/Kishi_Bashi_-_It_All_Began_With_a_Burst.mp3"
+				src="/Papa Khan - Wounds [NCS Release].mp3"
 				type="audio/mp3"
-			/>
-			<source
-				src="https://cors-anywhere.herokuapp.com/https://cdn.plyr.io/static/demo/Kishi_Bashi_-_It_All_Began_With_a_Burst.ogg"
-				type="audio/ogg"
 			/>
 		</audio>
 	</Plyr>
