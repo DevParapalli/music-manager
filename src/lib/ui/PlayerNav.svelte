@@ -12,7 +12,7 @@
 	import { fade } from 'svelte/transition';
 	import { get } from 'svelte/store';
 	//import { appWindow } from '@tauri-apps/api/window';
-	import { pageTitle, Queue } from '../../stores/store';
+	import { pageTitle, Queue, currentStatus } from '../../stores/store';
 	import nanobar from 'nanobar';
 
 	onMount(async () => {
@@ -40,7 +40,7 @@
 	};
 
 	// Plyr Integration Stuff.
-	let eventsEmitted = ['timeupdate', 'play', 'pause', 'ready', 'progress'];
+	let eventsEmitted = ['timeupdate', 'play', 'pause', 'ready', 'progress', 'ended'];
 	let progressBar, bufferBar;
 	// Play/Pause
 	$: isPlaying = false;
@@ -49,10 +49,14 @@
 		//console.log(event)
 		isPlaying = true;
 	}
+
+
 	function pause(event) {
 		//console.log(event)
 		isPlaying = false;
 	}
+
+
 	// Skip to Next Source
 	function next(event) {
 		//console.log(event)
@@ -61,7 +65,15 @@
 		isPlaying = false;
 		// Reset Time Progress Bar to 0.
 		progressBar.go(0);
+		// Use the player to play the next source.
+		player.togglePlay();
 	}
+	// next song if ended.
+	function ended(event) {
+		console.log(event)
+		next();
+	}
+
 	// Function for updating elements based on time.
 	let currentTime, duration;
 	function timeupdate(event) {
@@ -82,8 +94,11 @@
 		`;
 		progressBar.go(Number(event.detail.currentTime / event.detail.duration) * 100);
 	}
+
+
 	// create ProgressBar when the player is ready and only get ready once.
 	let isReady = false;
+	$: playerStatus = get(currentStatus);
 	function ready(event) {
 		if (isReady) {
 			return;
@@ -94,13 +109,16 @@
 			classname: 'progress-bar',
 			target: playerProgress
 		});
+		// Setup Current Song in Player
+		player.source = playerStatus.source
+		console.log(player.source)
+		player.currentTime = playerStatus.current_time
 		isReady = true;
-		// Setup BufferProgressBar
-		//bufferBar = document.createElement('div');
-		//bufferBar.classList.add('buffer-bar');
-		//bufferBar['go'] = (percent) => (bufferBar.style.width = `${percent}%`);
-		//console.log('%c [plyr] Player Ready ', 'background-color: green; text-color: white')
+		console.log('%c [plyr] Player Ready ', 'background-color: green; text-color: white')
+		
 	}
+
+
 	// Handle clicks for timeskip.
 	function handle_timeskip_click(event) {
 		let bar = document.getElementById('progress-bar');
@@ -129,6 +147,8 @@
 		//volume = event.detail.volume;
 	}
 	$: handle_volume_change(volume);
+
+
 
 	// Keyboard Shortcuts for Player
 	function handle_keypress(event) {
@@ -255,7 +275,7 @@
 			<slot />
 		</div>
 	</div>
-	<div id="player" class="flex flex-col self-center w-full h-24 align-middle select-none">
+	<div id="player" class="flex flex-col content-between self-center w-full h-24 align-middle select-none">
 		<div id="progress-bar" on:click={handle_timeskip_click}>
 			<!--
 				<div class="nanobar progress-bar" style="position: relative;">
@@ -312,12 +332,12 @@
 			</li>
 			<li class="pl-8 pr-4">
 				<span class="max-h-16 max-w-16">
-					<img class="rounded" src="https://dummyimage.com/64x64" alt="Album Art" />
+					<img class="rounded" src="{playerStatus.album_art || 'https://dummyimage.com/64x64'}" alt="Album Art" />
 				</span>
 			</li>
 			<li class="flex-grow-[2] px-4 text-left flex flex-col select-text">
-				<span>SONG NAME</span>
-				<span>ARTIST NAME | ALBUM NAME</span>
+				<span>{playerStatus.title}</span>
+				<span>{playerStatus.album} | {playerStatus.artist}</span>
 			</li>
 			<li class="flex-grow-[1] flex flex-row">
 				<span>
@@ -352,13 +372,11 @@
 		on:timeupdate={timeupdate}
 		on:play={play}
 		on:pause={pause}
+		on:ended={ended}
 		eventsToEmit={eventsEmitted}
 	>
-		<audio crossorigin="" playsinline>
-			<source
-				src="/Papa Khan - Wounds [NCS Release].mp3"
-				type="audio/mp3"
-			/>
+		<audio id="audio" crossorigin="" playsinline>
+			<source src="/" type="audio/mp3" />
 		</audio>
 	</Plyr>
 </div>
