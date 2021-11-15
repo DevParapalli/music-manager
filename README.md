@@ -1,5 +1,11 @@
-# Template Repository : SvelteKit + TailwindCSS (3.0.0-alpha) + Tauri Studio
+# Music Thingy IDK WHAT IT DOES
 
-- Very Opinionated (I enjoy working with TailwindCSS and I like the Nord Pallette.)
+Install Rust, then do `yarn install` and then `yarn tauri dev` for full functionality, else do `yarn dev` for UI things.
 
-Run `yarn install` to install all dependencies. Then run`yarn tauri dev` to get started.
+## Controls
+
+- `K` - Play / Pause
+- `ArrowUp` - Volume Up
+- `ArrowDown` - Volume Down
+- `ArrowLeft` - Seek Backward (5s)
+- `ArrowRight` - Seek Forward (5s)
