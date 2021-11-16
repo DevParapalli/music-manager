@@ -57,9 +57,3 @@ if (browser) {
 	Queue.subscribe(q => localStorage.setItem('Queue', JSON.stringify(q)));
 }
 
-
-export const QueueIndex = writable<number>(browser ? JSON.parse(localStorage.getItem('QueueIndex')) ? JSON.parse(localStorage.getItem('QueueIndex')) : 0 : 0);
-if (browser) {
-	QueueIndex.subscribe(qi => localStorage.setItem('QueueIndex', JSON.stringify(qi)));
-}
-

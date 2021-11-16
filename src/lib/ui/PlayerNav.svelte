@@ -60,7 +60,7 @@
 	// Skip to Next Source
 	function next(event) {
 		//console.log(event)
-		player.source = altsource;
+		player.source = altsource // $currentStatus.queue_index += 1;; 
 		// Reset Play Toggle to Paused
 		isPlaying = false;
 		// Reset Time Progress Bar to 0.
@@ -98,7 +98,6 @@
 
 	// create ProgressBar when the player is ready and only get ready once.
 	let isReady = false;
-	$: playerStatus = get(currentStatus);
 	function ready(event) {
 		if (isReady) {
 			return;
@@ -110,9 +109,9 @@
 			target: playerProgress
 		});
 		// Setup Current Song in Player
-		player.source = playerStatus.source
+		player.source = $currentStatus.source
 		console.log(player.source)
-		player.currentTime = playerStatus.current_time
+		player.currentTime = $currentStatus.current_time
 		isReady = true;
 		console.log('%c [plyr] Player Ready ', 'background-color: green; text-color: white')
 		
@@ -332,12 +331,12 @@
 			</li>
 			<li class="pl-8 pr-4">
 				<span class="max-h-16 max-w-16">
-					<img class="rounded" src="{playerStatus.album_art || 'https://dummyimage.com/64x64'}" alt="Album Art" />
+					<img class="rounded" src="{$currentStatus.album_art || 'https://dummyimage.com/64x64'}" alt="Album Art" />
 				</span>
 			</li>
 			<li class="flex-grow-[2] px-4 text-left flex flex-col select-text">
-				<span>{playerStatus.title}</span>
-				<span>{playerStatus.album} | {playerStatus.artist}</span>
+				<span>{$currentStatus.title}</span>
+				<span>{$currentStatus.album} | {$currentStatus.artist}</span>
 			</li>
 			<li class="flex-grow-[1] flex flex-row">
 				<span>
