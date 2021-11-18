@@ -42,8 +42,10 @@
 	// Plyr Integration Stuff.
 	let eventsEmitted = ['timeupdate', 'play', 'pause', 'ready', 'progress', 'ended'];
 	let progressBar, bufferBar;
+	//function 
+	
 	// Play/Pause
-	$: isPlaying = false;
+	let isPlaying = false;
 
 	function play(event) {
 		//console.log(event)
@@ -60,14 +62,47 @@
 	// Skip to Next Source
 	function next(event) {
 		//console.log(event)
-		player.source = altsource // $currentStatus.queue_index += 1;; 
+		$currentStatus.queue_position += 1;
+		if ($currentStatus.queue_position > $Queue.length - 1) {
+			$currentStatus.queue_position = $Queue.length - 1;
+			return
+		}
+		$currentStatus = Object.assign({}, $currentStatus, $Queue[$currentStatus.queue_position]) //$Queue[$currentStatus.queue_position]
 		// Reset Play Toggle to Paused
 		isPlaying = false;
+		// Setup Source
+		console.log($currentStatus, $Queue)
+		player.source = $Queue[$currentStatus.queue_position].source;
+
 		// Reset Time Progress Bar to 0.
 		progressBar.go(0);
 		// Use the player to play the next source.
+		
 		player.togglePlay();
 	}
+	// Previous
+	function previous(event) {
+		//console.log(event)
+		$currentStatus.queue_position -= 1;
+		if ($currentStatus.queue_position < 0) {
+			$currentStatus.queue_position = 0;
+			return
+		}
+		$currentStatus = Object.assign({}, $currentStatus, $Queue[$currentStatus.queue_position]) //$Queue[$currentStatus.queue_position]
+		// Reset Play Toggle to Paused
+		isPlaying = false;
+		// Setup Source
+		console.log($currentStatus, $Queue)
+		player.source = $Queue[$currentStatus.queue_position].source;
+
+		// Reset Time Progress Bar to 0.
+		progressBar.go(0);
+		// Use the player to play the next source.
+		
+		player.togglePlay();
+	}
+
+
 	// next song if ended.
 	function ended(event) {
 		console.log(event)
@@ -110,8 +145,11 @@
 		});
 		// Setup Current Song in Player
 		player.source = $currentStatus.source
-		console.log(player.source)
-		player.currentTime = $currentStatus.current_time
+		if ($currentStatus.queue_position === -1) {
+			next();
+			player.pause();
+		}
+		//console.log(player.source)
 		isReady = true;
 		console.log('%c [plyr] Player Ready ', 'background-color: green; text-color: white')
 		
@@ -284,7 +322,7 @@
 		</div>
 		<ul class="flex flex-1 flex-row items-center h-20">
 			<li class="flex pl-4">
-				<span id="skip-previous" class="p-4 cursor-pointer rounded-full hover:text-nord6 hover:shadow-md hover:bg-nord3 active:bg-nord1">
+				<span id="skip-previous" on:click="{previous}" class="p-4 cursor-pointer rounded-full hover:text-nord6 hover:shadow-md hover:bg-nord3 active:bg-nord1">
 					<svg
 						class="h-8 w-8"
 						xmlns="http://www.w3.org/2000/svg"
@@ -300,7 +338,7 @@
 					id="playback-toggle"
 					class="p-4 cursor-pointer rounded-full hover:text-nord6 hover:shadow-md hover:bg-nord3 active:bg-nord1"
 					transition:fade
-					on:click|preventDefault={() => player.togglePlay()}
+					on:click={player.togglePlay}
 				>
 					<svg
 						class="h-8 w-8"
@@ -316,7 +354,7 @@
 						/></svg
 					>
 				</span>
-				<span id="skip-next" on:click="{() => next()}" class="p-4 cursor-pointer rounded-full hover:text-nord6 hover:shadow-md hover:bg-nord3 active:bg-nord1">
+				<span id="skip-next" on:click="{next}" class="p-4 cursor-pointer rounded-full hover:text-nord6 hover:shadow-md hover:bg-nord3 active:bg-nord1">
 					<svg
 						class="h-8 w-8"
 						xmlns="http://www.w3.org/2000/svg"
@@ -331,10 +369,10 @@
 			</li>
 			<li class="pl-8 pr-4">
 				<span class="max-h-16 max-w-16">
-					<img class="rounded" src="{$currentStatus.album_art || 'https://dummyimage.com/64x64'}" alt="Album Art" />
+					<img class="rounded h-16 w-16" src="{$currentStatus.album_art || 'https://dummyimage.com/64x64'}" alt="Album Art" />
 				</span>
 			</li>
-			<li class="flex-grow-[2] px-4 text-left flex flex-col select-text">
+			<li class="flex-none w-[65vw] px-4 text-left flex flex-col select-text">
 				<span>{$currentStatus.title}</span>
 				<span>{$currentStatus.album} | {$currentStatus.artist}</span>
 			</li>

@@ -56,9 +56,9 @@
 			{
 				"title": "tauri-sveltekit-tailwind",
 				"width": 1280,
-				"minWidth": 640,
+				"minWidth": 1280,
 				"height": 720,
-				"minHeight": 360,
+				"minHeight": 720,
 				"resizable": true,
 				"fullscreen": false
 			}

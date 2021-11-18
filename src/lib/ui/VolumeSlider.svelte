@@ -1,5 +1,5 @@
 <script>
-	export let value = 50;
+	export let value = 75;
 	//$: console.log(value);
 </script>
 
