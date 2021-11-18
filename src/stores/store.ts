@@ -1,4 +1,4 @@
-import { browser, dev } from '$app/env';
+import { browser} from '$app/env';
 import { writable } from 'svelte/store';
 
 export const pageTitle = writable<string>('Music Thingy');
@@ -68,7 +68,7 @@ export const currentStatus = writable<State>(initialState);
 
 if (browser) {
 	const storedStatus = JSON.parse(localStorage.getItem('currentStatus'));
-	if (storedStatus != null && !dev) {
+	if (storedStatus != null) {
 		currentStatus.set(storedStatus);
 	} else {
 		currentStatus.set(initialState);

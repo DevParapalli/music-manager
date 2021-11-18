@@ -29,15 +29,6 @@
 	import { Plyr } from 'svelte-plyr';
 	import VolumeSlider from './VolumeSlider.svelte';
 	let player;
-	let altsource = {
-		type: 'audio',
-		sources: [
-			{
-				src: 'Different Heaven & EH!DE - My Heart [NCS Release].mp3',
-				type: 'audio/mp3'
-			}
-		]
-	};
 
 	// Plyr Integration Stuff.
 	let eventsEmitted = ['timeupdate', 'play', 'pause', 'ready', 'progress', 'ended'];
@@ -71,14 +62,20 @@
 		// Reset Play Toggle to Paused
 		isPlaying = false;
 		// Setup Source
-		console.log($currentStatus, $Queue)
+		//console.log($currentStatus, $Queue)
 		player.source = $Queue[$currentStatus.queue_position].source;
 
 		// Reset Time Progress Bar to 0.
 		progressBar.go(0);
 		// Use the player to play the next source.
+		try {
+			player.togglePlay();
+		} catch (error) {
+			console.log('%c [Plyr] cannot autoplay unless the user interacts with the page. ', 'background-color: red; color: white;')
+			//console.log(error);
+			
+		}
 		
-		player.togglePlay();
 	}
 	// Previous
 	function previous(event) {
@@ -92,7 +89,7 @@
 		// Reset Play Toggle to Paused
 		isPlaying = false;
 		// Setup Source
-		console.log($currentStatus, $Queue)
+		//console.log($currentStatus, $Queue)
 		player.source = $Queue[$currentStatus.queue_position].source;
 
 		// Reset Time Progress Bar to 0.
@@ -105,7 +102,7 @@
 
 	// next song if ended.
 	function ended(event) {
-		console.log(event)
+		//console.log(event)
 		next();
 	}
 
@@ -308,11 +305,11 @@
 				</span>
 			</div>
 		</nav>
-		<div class="flex w-full justify-center align-middle">
+		<div class="flex w-full justify-center bg-nord1 align-middle">
 			<slot />
 		</div>
 	</div>
-	<div id="player" class="flex flex-col content-between self-center w-full h-24 align-middle select-none">
+	<div id="player" class="flex bg-nord2 flex-col content-between self-center w-full h-24 align-middle select-none">
 		<div id="progress-bar" on:click={handle_timeskip_click}>
 			<!--
 				<div class="nanobar progress-bar" style="position: relative;">
@@ -372,11 +369,11 @@
 					<img class="rounded h-16 w-16" src="{$currentStatus.album_art || 'https://dummyimage.com/64x64'}" alt="Album Art" />
 				</span>
 			</li>
-			<li class="flex-none w-[65vw] px-4 text-left flex flex-col select-text">
+			<li class="flex-grow px-4 text-left flex flex-col select-text">
 				<span>{$currentStatus.title}</span>
 				<span>{$currentStatus.album} | {$currentStatus.artist}</span>
 			</li>
-			<li class="flex-grow-[1] flex flex-row">
+			<li class="ml-auto mr-6 flex flex-row">
 				<span>
 					<svg
 						class="h-7 w-7 mx-4"
