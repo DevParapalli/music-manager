@@ -12,7 +12,7 @@
 	import { fade } from 'svelte/transition';
 	import { get } from 'svelte/store';
 	//import { appWindow } from '@tauri-apps/api/window';
-	import { pageTitle, Queue, currentStatus } from '../../stores/store';
+	import { pageTitle, queue, currentStatus } from '../../stores/store';
 	import nanobar from 'nanobar';
 
 	onMount(async () => {
@@ -54,16 +54,16 @@
 	function next(event) {
 		//console.log(event)
 		$currentStatus.queue_position += 1;
-		if ($currentStatus.queue_position > $Queue.length - 1) {
-			$currentStatus.queue_position = $Queue.length - 1;
+		if ($currentStatus.queue_position > $queue.length - 1) {
+			$currentStatus.queue_position = $queue.length - 1;
 			return
 		}
-		$currentStatus = Object.assign({}, $currentStatus, $Queue[$currentStatus.queue_position]) //$Queue[$currentStatus.queue_position]
+		$currentStatus = Object.assign({}, $currentStatus, $queue[$currentStatus.queue_position]) //$Queue[$currentStatus.queue_position]
 		// Reset Play Toggle to Paused
 		isPlaying = false;
 		// Setup Source
 		//console.log($currentStatus, $Queue)
-		player.source = $Queue[$currentStatus.queue_position].source;
+		player.source = $queue[$currentStatus.queue_position].source;
 
 		// Reset Time Progress Bar to 0.
 		progressBar.go(0);
@@ -71,7 +71,7 @@
 		try {
 			player.togglePlay();
 		} catch (error) {
-			console.log('%c [Plyr] cannot autoplay unless the user interacts with the page. ', 'background-color: red; color: white;')
+			console.log('%c [Plyr] Cannot autoplay unless the user has interacted with the page. ', 'background-color: green; color: red;')
 			//console.log(error);
 			
 		}
@@ -85,12 +85,12 @@
 			$currentStatus.queue_position = 0;
 			return
 		}
-		$currentStatus = Object.assign({}, $currentStatus, $Queue[$currentStatus.queue_position]) //$Queue[$currentStatus.queue_position]
+		$currentStatus = Object.assign({}, $currentStatus, $queue[$currentStatus.queue_position]) //$Queue[$currentStatus.queue_position]
 		// Reset Play Toggle to Paused
 		isPlaying = false;
 		// Setup Source
 		//console.log($currentStatus, $Queue)
-		player.source = $Queue[$currentStatus.queue_position].source;
+		player.source = $queue[$currentStatus.queue_position].source;
 
 		// Reset Time Progress Bar to 0.
 		progressBar.go(0);

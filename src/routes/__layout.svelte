@@ -5,7 +5,7 @@
 </script>
 
 <PlayerNav>
-	<div class="h-stretch">
+	<div class="h-stretch flex-grow">
 	<slot />
 	</div>	
 </PlayerNav>
