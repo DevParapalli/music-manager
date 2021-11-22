@@ -61,7 +61,7 @@ export const songs = writable<Array<Song>>([]);
 
 const sampleSongs = <Array<Song>>[
 	{
-		title: 'Aero Chord & Anuka - Incomplete (Muzzy Remix) [NCS Release]',
+		title: 'Incomplete (Muzzy Remix)',
 		artist: 'Aero Chord & Anuka',
 		album: 'Incomplete',
 		album_art:
@@ -77,7 +77,7 @@ const sampleSongs = <Array<Song>>[
 		}
 	},
 	{
-		title: 'Different Heaven & EH!DE - My Heart [NCS Release]',
+		title: 'My Heart',
 		artist: 'Different Heaven & EH!DE',
 		album: 'My Heart',
 		album_art:
@@ -93,7 +93,7 @@ const sampleSongs = <Array<Song>>[
 		}
 	},
 	{
-		title: 'Elektronomia & RUD - Rollercoaster [NCS Release]',
+		title: 'Rollercoaster',
 		artist: 'Elektronomia & RUD',
 		album: 'Rollercoaster',
 		album_art:
@@ -109,7 +109,7 @@ const sampleSongs = <Array<Song>>[
 		}
 	},
 	{
-		title: 'Mo Falk & OVSKY - Home [NCS Release]',
+		title: 'Home',
 		artist: 'Mo Falk & OVSKY',
 		album: 'Home',
 		album_art:
@@ -125,7 +125,7 @@ const sampleSongs = <Array<Song>>[
 		}
 	},
 	{
-		title: 'Papa Khan - Wounds [NCS Release]',
+		title: 'Wounds',
 		artist: 'Papa Khan',
 		album: 'Wounds',
 		album_art:
@@ -141,7 +141,7 @@ const sampleSongs = <Array<Song>>[
 		}
 	},
 	{
-		title: 'STAR SEED- Cayenne (feat. Zoe Moon) [NCS Release]',
+		title: 'Cayenne (feat. Zoe Moon)',
 		artist: 'STAR SEED feat. Zoe Moon',
 		album: 'Cayenne',
 		album_art:
@@ -157,7 +157,7 @@ const sampleSongs = <Array<Song>>[
 		}
 	},
 	{
-		title: 'THYKIER - Station 2 [NCS Release]',
+		title: 'Station 2',
 		artist: 'THYKIER',
 		album: 'Station 2',
 		album_art:

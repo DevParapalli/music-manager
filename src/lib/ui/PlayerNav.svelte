@@ -33,11 +33,9 @@
 	// Plyr Integration Stuff.
 	let eventsEmitted = ['timeupdate', 'play', 'pause', 'ready', 'progress', 'ended'];
 	let progressBar, bufferBar;
-	//function 
 	
 	// Play/Pause
 	let isPlaying = false;
-
 	function play(event) {
 		//console.log(event)
 		isPlaying = true;
@@ -48,7 +46,6 @@
 		//console.log(event)
 		isPlaying = false;
 	}
-
 
 	// Skip to Next Source
 	function next(event) {
@@ -142,7 +139,7 @@
 		});
 		// Setup Current Song in Player
 		player.source = $currentStatus.source
-		if ($currentStatus.queue_position === -1) {
+		if ($currentStatus.queue_position <= 0) {
 			next();
 			player.pause();
 		}
@@ -366,7 +363,7 @@
 			</li>
 			<li class="pl-8 pr-4">
 				<span class="max-h-16 max-w-16">
-					<img class="rounded h-16 w-16" src="{$currentStatus.album_art || 'https://dummyimage.com/64x64'}" alt="Album Art" />
+					<img class="rounded h-20 w-20" src="{$currentStatus.album_art || 'https://dummyimage.com/64x64'}" alt="Album Art" />
 				</span>
 			</li>
 			<li class="flex-grow px-4 text-left flex flex-col select-text">

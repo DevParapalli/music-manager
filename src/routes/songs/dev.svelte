@@ -1,15 +1,13 @@
 <script>
 	let dev = false;
+	import SongListItem from "$lib/ui/SongListItem.svelte";
+	import {songs} from "../../stores/store"
 </script>
 
-<div class="flex flex-wrap content-evenly justify-center w-[92vw] text-nord5">
-	<span style="flex: 0 1 100%;" class="flex justify-center my-px h-min p-2 w-11/12 text-center">
-		<span class="bg-red-600 w-full">NO</span>
-	</span>
-	<span style="flex: 0 1 100%;" class="flex justify-center my-px h-min p-2 text-center">
-		<a href="/artists/{dev ? 'dev' : ''}" class="bg-blue-600 p-2 rounded text-lg w-32">ARTISTS</a>
-	</span>
-	<span style="flex: 0 1 100%;" class="flex justify-center my-px h-min p-2 text-center">
-		<a href="/albums/{dev ? 'dev' : ''}" class="bg-blue-600 p-2 rounded text-lg w-32">ALBUMS</a>
-	</span>
+<div class="flex flex-wrap content-evenly justify-center w-[92vw] mx-auto mt-4 text-nord5">
+	{#each $songs as s}
+	<SongListItem song={s}/>
+	{:else}
+		 <!-- empty list -->
+	{/each}
 </div>
