@@ -66,6 +66,9 @@
 	// Play/Pause
 	let isPlaying = false;
 	function play(event) {
+		if (player.source.sources[0].src === '/404.mp3') {
+			player.pause();
+		}
 		//Event emmited for UI updates.
 		isPlaying = true;
 	}
@@ -138,7 +141,10 @@
 				'%c [Plyr] Cannot "NEXT" from last song on queue, CAUSE: SONG END',
 				'background-color: black; color: yellow'
 			);
+			$currentStatus.queue_position = $queue.length;
 			$currentStatus = Object.assign({}, $currentStatus, queueEndedState);
+			// Prevent Player from playing previous song.
+			player.source = queueEndedState.source;
 		}
 	}
 

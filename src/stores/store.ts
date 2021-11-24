@@ -63,7 +63,7 @@ export const queueEndedState = <State>{
 		]
 	},
 	current_time: 0,
-	queue_position: -1,
+	//queue_position: -1, // Removed so it doesnt override the queue position
 	is_playing: false,
 	update: ''
 };
