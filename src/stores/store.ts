@@ -23,6 +23,7 @@ export interface State extends Song {
 	current_time: number;
 	queue_position: number;
 	is_playing: boolean;
+	update: string;
 }
 
 export const currentStatus = writable<State>(null);
@@ -43,7 +44,28 @@ const initialState = <State>{
 	},
 	current_time: 0,
 	queue_position: -1,
-	is_playing: false
+	is_playing: false,
+	update: ''
+};
+
+export const queueEndedState = <State>{
+	title: 'Queue has ended.',
+	artist: '',
+	album: '',
+	album_art: '',
+	source: {
+		type: 'audio',
+		sources: [
+			{
+				src: '/404.mp3',
+				type: 'audio/mp3'
+			}
+		]
+	},
+	current_time: 0,
+	queue_position: -1,
+	is_playing: false,
+	update: ''
 };
 
 if (browser) {
@@ -53,7 +75,9 @@ if (browser) {
 	} else {
 		currentStatus.set(initialState);
 	}
-	if (dev) {currentStatus.set(initialState);}
+	if (dev) {
+		currentStatus.set(initialState);
+	}
 	currentStatus.subscribe((cs) => localStorage.setItem('currentStatus', JSON.stringify(cs)));
 }
 
@@ -181,16 +205,16 @@ if (browser) {
 	} else {
 		songs.set(sampleSongs);
 	}
-	if (dev) {songs.set(sampleSongs);}
+	if (dev) {
+		songs.set(sampleSongs);
+	}
 	songs.subscribe((s) => localStorage.setItem('songs', JSON.stringify(s)));
 }
-
 
 export const queue = writable<Array<Song>>([]);
 
 const sampleQueue = <Array<Song>>[];
 sampleQueue.push(sampleSongs[6], sampleSongs[1], sampleSongs[2], sampleSongs[4]);
-
 
 if (browser) {
 	const storedQueue = JSON.parse(localStorage.getItem('Queue'));
@@ -199,6 +223,8 @@ if (browser) {
 	} else {
 		queue.set(sampleQueue);
 	}
-	if (dev) {queue.set(sampleQueue);}
+	if (dev) {
+		queue.set(sampleQueue);
+	}
 	queue.subscribe((q) => localStorage.setItem('Queue', JSON.stringify(q)));
 }

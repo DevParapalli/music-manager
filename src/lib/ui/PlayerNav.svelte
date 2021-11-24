@@ -12,7 +12,7 @@
 	import { fade } from 'svelte/transition';
 	import { get } from 'svelte/store';
 	//import { appWindow } from '@tauri-apps/api/window';
-	import { pageTitle, queue, currentStatus } from '../../stores/store';
+	import { pageTitle, queue, currentStatus, queueEndedState } from '../../stores/store';
 	import nanobar from 'nanobar';
 
 	onMount(async () => {
@@ -32,18 +32,46 @@
 
 	// Plyr Integration Stuff.
 	let eventsEmitted = ['timeupdate', 'play', 'pause', 'ready', 'progress', 'ended'];
-	let progressBar, bufferBar;
-	
+	let progressBar;
+
+	function update_handler(status) {
+		switch (status) {
+			case '':
+				// Empty case, do nothing.
+				break;
+
+			case 'next':
+				next('');
+				break;
+
+			case 'previous':
+				previous('');
+				break;
+
+			case 'play':
+				player.play();
+				break;
+
+			default:
+				console.log(
+					`%c [Player] Invalid update state : ${status} `,
+					'background-color: black; color: red;'
+				);
+				break;
+		}
+		$currentStatus.update = '';
+	}
+	$: update_handler($currentStatus.update);
+
 	// Play/Pause
 	let isPlaying = false;
 	function play(event) {
-		//console.log(event)
+		//Event emmited for UI updates.
 		isPlaying = true;
 	}
 
-
 	function pause(event) {
-		//console.log(event)
+		//Event emmited for UI updates.
 		isPlaying = false;
 	}
 
@@ -52,10 +80,14 @@
 		//console.log(event)
 		$currentStatus.queue_position += 1;
 		if ($currentStatus.queue_position > $queue.length - 1) {
+			console.log(
+				'%c [Plyr] Cannot "NEXT" from last song on queue.',
+				'background-color: black; color: yellow'
+			);
 			$currentStatus.queue_position = $queue.length - 1;
-			return
+			return;
 		}
-		$currentStatus = Object.assign({}, $currentStatus, $queue[$currentStatus.queue_position]) //$Queue[$currentStatus.queue_position]
+		$currentStatus = Object.assign({}, $currentStatus, $queue[$currentStatus.queue_position]);
 		// Reset Play Toggle to Paused
 		isPlaying = false;
 		// Setup Source
@@ -68,11 +100,12 @@
 		try {
 			player.togglePlay();
 		} catch (error) {
-			console.log('%c [Plyr] Cannot autoplay unless the user has interacted with the page. ', 'background-color: green; color: red;')
+			console.log(
+				'%c [Plyr] Cannot autoplay unless the user has interacted with the page. ',
+				'background-color: black; color: red;'
+			);
 			//console.log(error);
-			
 		}
-		
 	}
 	// Previous
 	function previous(event) {
@@ -80,9 +113,9 @@
 		$currentStatus.queue_position -= 1;
 		if ($currentStatus.queue_position < 0) {
 			$currentStatus.queue_position = 0;
-			return
+			return;
 		}
-		$currentStatus = Object.assign({}, $currentStatus, $queue[$currentStatus.queue_position]) //$Queue[$currentStatus.queue_position]
+		$currentStatus = Object.assign({}, $currentStatus, $queue[$currentStatus.queue_position]); //$Queue[$currentStatus.queue_position]
 		// Reset Play Toggle to Paused
 		isPlaying = false;
 		// Setup Source
@@ -92,15 +125,21 @@
 		// Reset Time Progress Bar to 0.
 		progressBar.go(0);
 		// Use the player to play the next source.
-		
+
 		player.togglePlay();
 	}
 
-
 	// next song if ended.
 	function ended(event) {
-		//console.log(event)
-		next();
+		if ($currentStatus.queue_position < $queue.length - 1) {
+			next('');
+		} else {
+			console.log(
+				'%c [Plyr] Cannot "NEXT" from last song on queue, CAUSE: SONG END',
+				'background-color: black; color: yellow'
+			);
+			$currentStatus = Object.assign({}, $currentStatus, queueEndedState);
+		}
 	}
 
 	// Function for updating elements based on time.
@@ -118,12 +157,11 @@
 		let durationMinutes = Math.floor(event.detail.duration / 60);
 		let durationSeconds = Math.floor(event.detail.duration - durationMinutes * 60);
 		duration = `
-		${(durationMinutes < 10) ? '0' + durationMinutes : durationMinutes} : 
-		${(durationSeconds < 10) ? '0' + durationSeconds : durationSeconds}
+		${durationMinutes < 10 ? '0' + durationMinutes : durationMinutes} : 
+		${durationSeconds < 10 ? '0' + durationSeconds : durationSeconds}
 		`;
 		progressBar.go(Number(event.detail.currentTime / event.detail.duration) * 100);
 	}
-
 
 	// create ProgressBar when the player is ready and only get ready once.
 	let isReady = false;
@@ -138,17 +176,15 @@
 			target: playerProgress
 		});
 		// Setup Current Song in Player
-		player.source = $currentStatus.source
+		player.source = $currentStatus.source;
 		if ($currentStatus.queue_position <= 0) {
 			next();
 			player.pause();
 		}
 		//console.log(player.source)
 		isReady = true;
-		console.log('%c [plyr] Player Ready ', 'background-color: green; text-color: white')
-		
+		console.log('%c [plyr] Player Ready ', 'background-color: black; color: green');
 	}
-
 
 	// Handle clicks for timeskip.
 	function handle_timeskip_click(event) {
@@ -179,11 +215,9 @@
 	}
 	$: handle_volume_change(volume);
 
-
-
 	// Keyboard Shortcuts for Player
 	function handle_keypress(event) {
-		if (event.ctrlKey ||  event.altKey) {
+		if (event.ctrlKey || event.altKey) {
 			return;
 		}
 		event.preventDefault();
@@ -219,8 +253,6 @@
 			}
 		}
 	}
-
-
 </script>
 
 <div class="flex flex-col">
@@ -306,7 +338,10 @@
 			<slot />
 		</div>
 	</div>
-	<div id="player" class="flex bg-nord2 flex-col content-between self-center w-full h-24 align-middle select-none">
+	<div
+		id="player"
+		class="flex bg-nord2 flex-col content-between self-center w-full h-24 align-middle select-none"
+	>
 		<div id="progress-bar" on:click={handle_timeskip_click}>
 			<!--
 				<div class="nanobar progress-bar" style="position: relative;">
@@ -316,7 +351,11 @@
 		</div>
 		<ul class="flex flex-1 flex-row items-center h-20">
 			<li class="flex pl-4">
-				<span id="skip-previous" on:click="{previous}" class="p-4 cursor-pointer rounded-full hover:text-nord6 hover:shadow-md hover:bg-nord3 active:bg-nord1">
+				<span
+					id="skip-previous"
+					on:click={previous}
+					class="p-4 cursor-pointer rounded-full hover:text-nord6 hover:shadow-md hover:bg-nord3 active:bg-nord1"
+				>
 					<svg
 						class="h-8 w-8"
 						xmlns="http://www.w3.org/2000/svg"
@@ -348,7 +387,11 @@
 						/></svg
 					>
 				</span>
-				<span id="skip-next" on:click="{next}" class="p-4 cursor-pointer rounded-full hover:text-nord6 hover:shadow-md hover:bg-nord3 active:bg-nord1">
+				<span
+					id="skip-next"
+					on:click={next}
+					class="p-4 cursor-pointer rounded-full hover:text-nord6 hover:shadow-md hover:bg-nord3 active:bg-nord1"
+				>
 					<svg
 						class="h-8 w-8"
 						xmlns="http://www.w3.org/2000/svg"
@@ -363,12 +406,20 @@
 			</li>
 			<li class="pl-8 pr-4">
 				<span class="max-h-16 max-w-16">
-					<img class="rounded h-20 w-20" src="{$currentStatus.album_art || 'https://dummyimage.com/64x64'}" alt="Album Art" />
+					<img
+						class="rounded h-20 w-20"
+						src={$currentStatus.album_art || 'https://dummyimage.com/440x440'}
+						alt="Album Art"
+					/>
 				</span>
 			</li>
 			<li class="flex-grow px-4 text-left flex flex-col select-text">
 				<span>{$currentStatus.title}</span>
-				<span>{$currentStatus.album} | {$currentStatus.artist}</span>
+				{#if $currentStatus.artist}
+					<span>{$currentStatus.album} | {$currentStatus.artist}</span>
+				{:else}
+					<span>{$currentStatus.album}</span>
+				{/if}
 			</li>
 			<li class="ml-auto mr-6 flex flex-row">
 				<span>
@@ -412,4 +463,4 @@
 	</Plyr>
 </div>
 
-<svelte:window on:keydown="{handle_keypress}" />
+<svelte:window on:keydown={handle_keypress} />

@@ -1,12 +1,11 @@
 <script>
-import { assign } from 'svelte/internal';
+	import { assign } from 'svelte/internal';
 
 	export let song = {
 		title: 'SONG TITLE',
 		artist: 'SONG ARTIST',
 		album: 'SONG ALBUM',
-		album_art:
-			'https://dummyimage.com/440/',
+		album_art: 'https://dummyimage.com/440/',
 		source: {
 			type: 'audio',
 			sources: [
@@ -17,25 +16,53 @@ import { assign } from 'svelte/internal';
 			]
 		}
 	};
-    import {queue, currentStatus} from '../../stores/store'
+	import { queue, currentStatus } from '../../stores/store';
 
-    function play(event) {
-        //console.log(event);
-        $currentStatus = Object.assign({}, $currentStatus, song)
-        $queue.splice($currentStatus.queue_position+1, 0, song)
-        // TODO: Work out how the fuck to do this.
-        // Update a seperate store for the update state ?
-        //update_state()
-    }
-    function addNext(event) {
-        $queue.splice($currentStatus.queue_position+1, 0, song)
-    }
-    function addEnd(event) {
-        $queue.splice($queue.length, 0, song)
-    }
-    function edit(event) {
+	function play(event) {
+		//console.log(event);
+		if (
+			$currentStatus.title === song.title &&
+			$currentStatus.artist === song.artist &&
+			$currentStatus.album === song.album
+		) {
+			// Exit if the song is already playing
+			return;
+		}
+		$currentStatus = Object.assign({}, $currentStatus, song);
+		$queue.splice($currentStatus.queue_position + 1, 0, song);
+		$currentStatus.update = 'next';
+	}
 
-    }
+	function addNext(event) {
+		let songOnTargetPosition = $queue[$currentStatus.queue_position + 1]; // Check if Next Song is aleady in queue
+		if (
+			songOnTargetPosition.title === song.title &&
+			songOnTargetPosition.artist === song.artist &&
+			songOnTargetPosition.album === song.album
+		) {
+			// Exit if the song is already queued next
+			return;
+		}
+		$queue.splice($currentStatus.queue_position + 1, 0, song);
+	}
+	function addEnd(event) {
+		let songBeforeTargetPosition = $queue[$queue.length - 1];
+		if (
+			songBeforeTargetPosition.title === song.title &&
+			songBeforeTargetPosition.artist === song.artist &&
+			songBeforeTargetPosition.album === song.album
+		) {
+			// Exit if the song is already queued at end
+			return;
+		}
+		$queue.splice($queue.length, 0, song);
+	}
+	function edit(event) {
+		console.log(
+			'%c [Player] Function "EDIT" not implimented.',
+			'background-color: black; color: red;'
+		);
+	}
 </script>
 
 <div class="flex flex-row rounded-xl bg-nord3 hover:bg-nord2 w-full p-2 my-1">
@@ -44,14 +71,10 @@ import { assign } from 'svelte/internal';
 		<span class="ml-4 w-80 self-center">{song.title}</span>
 		<span class="ml-4 w-80 self-center text-slate-400">{song.album}</span>
 	</div>
-    <span class="ml-6 self-center text-slate-300">{song.artist}</span>
+	<span class="ml-6 self-center text-slate-300">{song.artist}</span>
 	<!--Spacer for Elements-->
 	<span class="self-center flex-grow" />
-	<span 
-    class="p-2 self-center rounded-full hover:bg-nord3" 
-    title="Play"
-    on:click="{play}"
-    >
+	<span class="p-2 self-center rounded-full hover:bg-nord3" title="Play" on:click={play}>
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
 			xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -63,11 +86,7 @@ import { assign } from 'svelte/internal';
 			><path d="M8.5 8.64L13.77 12L8.5 15.36V8.64M6.5 5v14l11-7" fill="currentColor" />
 		</svg>
 	</span>
-	<span 
-    class="p-2 self-center rounded-full hover:bg-nord3" 
-    title="Play Next"
-    on:click="{addNext}"
-    >
+	<span class="p-2 self-center rounded-full hover:bg-nord3" title="Play Next" on:click={addNext}>
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
 			xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -82,11 +101,7 @@ import { assign } from 'svelte/internal';
 			/>
 		</svg>
 	</span>
-	<span 
-    class="p-2 self-center rounded-full hover:bg-nord3" 
-    title="Play At End"
-    on:click="{addEnd}"
-    >
+	<span class="p-2 self-center rounded-full hover:bg-nord3" title="Play At End" on:click={addEnd}>
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
 			xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -102,11 +117,7 @@ import { assign } from 'svelte/internal';
 			/>
 		</svg>
 	</span>
-	<span 
-    class="p-2 self-center rounded-full hover:bg-nord3" 
-    title="Edit Metadata"
-    on:click="{edit}"
-    >
+	<span class="p-2 self-center rounded-full hover:bg-nord3" title="Edit Metadata" on:click={edit}>
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
 			xmlns:xlink="http://www.w3.org/1999/xlink"
