@@ -10,20 +10,10 @@
 
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
-	import { get } from 'svelte/store';
+	import { goto, prefetch } from '$app/navigation';
 	//import { appWindow } from '@tauri-apps/api/window';
 	import { pageTitle, queue, currentStatus, queueEndedState } from '../../stores/store';
 	import nanobar from 'nanobar';
-
-	onMount(async () => {
-		//current_value.subscribe((value) => {
-		//		progressBar.go(Number(value));
-		//	});
-		//appWindow.setTitle(get(pageTitle));
-		//pageTitle.subscribe((title) => {
-		//appWindow.setTitle(title);
-		//});
-	});
 
 	// Plyr Stuff
 	import { Plyr } from 'svelte-plyr';
@@ -52,6 +42,11 @@
 				player.play();
 				break;
 
+			case 'skip':
+				player.source = $currentStatus.source;
+				player.play();
+				break;
+
 			default:
 				console.log(
 					`%c [Player] Invalid update state : ${status} `,
@@ -66,7 +61,7 @@
 	// Play/Pause
 	let isPlaying = false;
 	function play(event) {
-		if (player.source.sources[0].src === '/404.mp3') {
+		if (player.source === '/404.mp3') {
 			player.pause();
 		}
 		//Event emmited for UI updates.
@@ -184,7 +179,7 @@
 		// Setup Current Song in Player
 		player.source = $currentStatus.source;
 		if ($currentStatus.queue_position <= 0) {
-			next();
+			next('');
 			player.pause();
 		}
 		//console.log(player.source)
@@ -222,22 +217,22 @@
 	$: handle_volume_change(volume);
 
 	// Keyboard Shortcuts for Player
-	function handle_keypress(event) {
-		if (event.ctrlKey || event.altKey) {
+	function handle_key(event) {
+		if (event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) {
 			return;
 		}
 		event.preventDefault();
-		//console.log(event)
+		console.log(event);
 		if (player) {
-			switch (event.key) {
+			switch (event.key.toLowerCase()) {
 				case 'k':
 					player.togglePlay();
 					break;
 				case 'l':
-					next();
+					next('');
 					break;
 				case 'j':
-					// Skip to Previous Song
+					previous('');
 					break;
 				case 'i':
 					// Shuffle Queue
@@ -276,27 +271,34 @@
 				</a>
 				<div class="mt-4">
 					<ul>
-						<li class="py-2 text-center hover:bg-nord2 rounded">
-							<a href="/">
-								<span class="h-5 w-5 mx-auto text-nord4 inline-block transition-colors duration-200"
+						<li
+							class="py-2 text-center hover:bg-nord2 rounded cursor-pointer"
+							on:click={() => goto('/player/queue')}
+						>
+							<span>
+								<span
+									class="h-5 w-5 mx-auto px-auto text-nord4 inline-block transition-colors duration-200"
 									><img
-										src="https://api.iconify.design/fe/play.svg?color=%23d8dee9"
+										src="https://api.iconify.design/mdi/playlist-music.svg?color=%23d8dee9"
 										alt=""
 										class="mx-auto h-6 w-6"
 									/>
 								</span>
-							</a>
+							</span>
 						</li>
-						<li class="py-2 text-center hover:bg-nord2">
-							<a href="/">
+						<li
+							class="py-2 text-center hover:bg-nord2 rounded cursor-pointer"
+							on:click={() => goto('/songs')}
+						>
+							<span>
 								<span class="h-5 w-5 mx-auto text-nord4 inline-block transition-colors duration-200"
 									><img
-										src="https://api.iconify.design/fe/home.svg?color=%23d8dee9"
+										src="https://api.iconify.design/mdi/music-note.svg?color=%23d8dee9"
 										alt=""
 										class="mx-auto h-6 w-6"
 									/>
 								</span>
-							</a>
+							</span>
 						</li>
 						<li class="py-2 text-center hover:bg-nord2">
 							<a href="./">
@@ -340,7 +342,9 @@
 				</span>
 			</div>
 		</nav>
-		<div class="flex w-full justify-center bg-nord1 align-middle">
+		<div
+			class="flex overflow-x-hidden overflow-y-scroll w-full justify-center bg-nord1 align-middle"
+		>
 			<slot />
 		</div>
 	</div>
@@ -438,7 +442,37 @@
 						preserveAspectRatio="xMidYMid meet"
 						viewBox="0 0 24 24"
 						><path
-							d="M14.83 13.41l-1.41 1.41l3.13 3.13L14.5 20H20v-5.5l-2.04 2.04l-3.13-3.13M14.5 4l2.04 2.04L4 18.59L5.41 20L17.96 7.46L20 9.5V4m-9.41 5.17L5.41 4L4 5.41l5.17 5.17l1.42-1.41z"
+							d="M15 6H3v2h12V6m0 4H3v2h12v-2M3 16h8v-2H3v2M17 6v8.18c-.31-.11-.65-.18-1-.18a3 3 0 0 0-3 3a3 3 0 0 0 3 3a3 3 0 0 0 3-3V8h3V6h-5z"
+							fill="currentColor"
+						/></svg
+					>
+				</span>
+				<span>
+					<svg
+						class="h-7 w-7 mx-4"
+						xmlns="http://www.w3.org/2000/svg"
+						xmlns:xlink="http://www.w3.org/1999/xlink"
+						aria-hidden="true"
+						role="img"
+						preserveAspectRatio="xMidYMid meet"
+						viewBox="0 0 24 24"
+						><path
+							d="M15 6H3v2h12V6m0 4H3v2h12v-2M3 16h8v-2H3v2M17 6v8.18c-.31-.11-.65-.18-1-.18a3 3 0 0 0-3 3a3 3 0 0 0 3 3a3 3 0 0 0 3-3V8h3V6h-5z"
+							fill="currentColor"
+						/></svg
+					>
+				</span>
+				<span>
+					<svg
+						class="h-7 w-7 mx-4"
+						xmlns="http://www.w3.org/2000/svg"
+						xmlns:xlink="http://www.w3.org/1999/xlink"
+						aria-hidden="true"
+						role="img"
+						preserveAspectRatio="xMidYMid meet"
+						viewBox="0 0 24 24"
+						><path
+							d="M15 6H3v2h12V6m0 4H3v2h12v-2M3 16h8v-2H3v2M17 6v8.18c-.31-.11-.65-.18-1-.18a3 3 0 0 0-3 3a3 3 0 0 0 3 3a3 3 0 0 0 3-3V8h3V6h-5z"
 							fill="currentColor"
 						/></svg
 					>
@@ -447,7 +481,9 @@
 					<!--Volume Slider-->
 					<VolumeSlider bind:value={volume} />
 				</span>
-				<span class="text-gray-400 text-sm">{currentTime || '00:00'} / {duration || '00:00'}</span>
+				<span class="text-gray-400 text-sm w-32"
+					>{currentTime || '00:00'} / {duration || '00:00'}</span
+				>
 			</li>
 		</ul>
 	</div>
@@ -469,4 +505,4 @@
 	</Plyr>
 </div>
 
-<svelte:window on:keydown={handle_keypress} />
+<svelte:window on:keydown={handle_key} />

@@ -1,6 +1,5 @@
 <script>
-	import { assign } from 'svelte/internal';
-
+	export let counter = NaN;
 	export let song = {
 		title: 'SONG TITLE',
 		artist: 'SONG ARTIST',
@@ -31,6 +30,8 @@
 		$currentStatus = Object.assign({}, $currentStatus, song);
 		$queue.splice($currentStatus.queue_position + 1, 0, song);
 		$currentStatus.update = 'next';
+		// Triggering Svelte's Reactivity
+		$queue = $queue;
 	}
 
 	function addNext(event) {
@@ -44,6 +45,7 @@
 			return;
 		}
 		$queue.splice($currentStatus.queue_position + 1, 0, song);
+		$queue = $queue;
 	}
 	function addEnd(event) {
 		let songBeforeTargetPosition = $queue[$queue.length - 1];
@@ -56,6 +58,7 @@
 			return;
 		}
 		$queue.splice($queue.length, 0, song);
+		$queue = $queue;
 	}
 	function edit(event) {
 		console.log(
@@ -66,6 +69,9 @@
 </script>
 
 <div class="flex flex-row rounded-xl bg-nord3 hover:bg-nord2 w-full p-2 my-1">
+	<span class="self-center p-2 w-[3rem]">
+		{counter + 1}
+	</span>
 	<img src={song.album_art} alt="Placeholder for Album Art" class="ml-2 rounded-lg h-16 w-16" />
 	<div class="flex flex-col self-center">
 		<span class="ml-4 w-80 self-center">{song.title}</span>

@@ -1,13 +1,12 @@
 <script>
-	let dev = false;
-	import SongListItem from "$lib/ui/SongListItem.svelte";
-	import {songs} from "../../stores/store"
+	import SongListItem from '$lib/ui/SongListItem.svelte';
+	import { songs } from '../../stores/store';
 </script>
 
-<div class="flex flex-wrap content-evenly justify-center w-[92vw] mx-auto mt-4 text-nord5">
-	{#each $songs as s}
-	<SongListItem song={s}/>
+<div class="flex flex-wrap content-evenly justify-center w-[92vw] mx-auto py-4 text-nord5">
+	{#each $songs as s, i}
+		<SongListItem song={s} counter={i} />
 	{:else}
-		 <!-- empty list -->
+		<!-- empty list -->
 	{/each}
 </div>

@@ -25,6 +25,6 @@
 		@apply bg-nord3 rounded-full;
 	}
 	.slider::-moz-range-track {
-		@apply bg-nord3 rounded-full ;
+		@apply bg-nord3 rounded-full;
 	}
 </style>

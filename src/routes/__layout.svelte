@@ -1,13 +1,16 @@
+<script context="module">
+	export const ssr = false;
+</script>
+
 <script>
 	import '../app.scss';
 	import PlayerNav from '$lib/ui/PlayerNav.svelte';
-	export const ssr = false;
 </script>
 
 <PlayerNav>
 	<div class="h-stretch flex-grow">
-	<slot />
-	</div>	
+		<slot />
+	</div>
 </PlayerNav>
 
 <style>
