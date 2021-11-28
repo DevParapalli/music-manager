@@ -2307,6 +2307,13 @@ iconv-lite@^0.4.24:
   dependencies:
     safer-buffer ">= 2.1.2 < 3"
 
+id3-parser@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/id3-parser/-/id3-parser-2.0.0.tgz#e1de845af0943dbefacad9fd7c037f50671d714f"
+  integrity sha512-bkGeAtUX70rC9sq2mjzIrkmPZjUsGuqCjZKGFJnugKXqYVDuJgfWDa8MehUZaCqlkoCaXkYevYeaRxkHOJsv9w==
+  dependencies:
+    promise-a-plus "^0.7.0"
+
 ieee754@^1.1.13, ieee754@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/ieee754/-/ieee754-1.2.1.tgz#8eb7a10a63fff25d15a57b001586d177d1b0d352"
@@ -3777,6 +3784,11 @@ progress@^2.0.0:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/progress/-/progress-2.0.3.tgz#7e8cf8d8f5b8f239c1bc68beb4eb78567d572ef8"
   integrity sha512-7PiHtLll5LdnKIMw100I+8xJXR5gW2QwWYkT6iJva0bXitZKa/XMrSbdmg3r2Xnaidz9Qumd0VPaMrZlF9V9sA==
+
+promise-a-plus@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/promise-a-plus/-/promise-a-plus-0.7.0.tgz#3d3cad69271dba462554c66b7d35bbd46e752a62"
+  integrity sha512-cWbWdSKaHiNGWP3aUSAq5nkZFYL1A6glTMgGc/LpFZ6DEJ5FRXzu7T2k4mmi+cD/R5EJ9DHHzWezXnO1IMPb5w==
 
 proto-list@~1.2.1:
   version "1.2.4"

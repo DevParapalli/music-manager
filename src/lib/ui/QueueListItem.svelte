@@ -16,6 +16,34 @@
 		}
 	};
 	import { queue, currentStatus } from '../../stores/store';
+	import { onMount } from 'svelte';
+	import universalParse from 'id3-parser/lib/universal';
+
+	onMount(() => {
+		let src = $queue[counter].source.sources[0].src;
+		let isParsed = $queue[counter].parsed;
+		if (isParsed) {
+			//return;
+		}
+		if (src.slice(-3) === 'mp3') {
+			universalParse(src).then((metadata) => {
+				$queue[counter].parsed = true;
+				$queue[counter].title = metadata.title;
+				$queue[counter].artist = metadata.artist;
+				$queue[counter].album = metadata.album;
+				//img.src = `data:${picture.format};base64,${picture.data.toString('base64')}`;
+				if (metadata.image) {
+					// @ts-ignore
+					let blob = new Blob([metadata.image.data], { type: metadata.image.mime });
+					let urlCreator = window.URL || window.webkitURL;
+					let imageUrl = urlCreator.createObjectURL(blob);
+					$queue[counter].album_art = imageUrl;
+				}
+			});
+		} else {
+			console.log('NO PARSER FOUND');
+		}
+	});
 
 	function play(event) {
 		//console.log(event);
@@ -44,7 +72,11 @@
 	<span class="self-center p-2 w-[3rem]">
 		{counter + 1}
 	</span>
-	<img src={song.album_art} alt="Placeholder for Album Art" class="ml-2 rounded-lg h-16 w-16" />
+	<img
+		src={song.album_art}
+		alt="Placeholder for Album Art"
+		class="ml-2 rounded-lg h-16 w-16 object-cover"
+	/>
 	<div class="flex flex-col self-center">
 		<span class="ml-4 w-80 self-center">{song.title}</span>
 		<span class="ml-4 w-80 self-center text-slate-400">{song.album}</span>

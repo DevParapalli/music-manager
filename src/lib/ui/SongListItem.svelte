@@ -1,10 +1,40 @@
-<script>
+<script lang="ts">
+	import { onMount } from 'svelte';
+	import universalParse from 'id3-parser/lib/universal';
+
+	onMount(() => {
+		let src = $songs[counter].source.sources[0].src;
+		let isParsed = $songs[counter].parsed;
+		if (isParsed) {
+			return;
+		}
+		if (src.slice(-3) === 'mp3') {
+			universalParse(src).then((metadata) => {
+				$songs[counter].parsed = true;
+				$songs[counter].title = metadata.title;
+				$songs[counter].artist = metadata.artist;
+				$songs[counter].album = metadata.album;
+				//img.src = `data:${picture.format};base64,${picture.data.toString('base64')}`;
+				if (metadata.image) {
+					// @ts-ignore
+					let blob = new Blob([metadata.image.data], { type: metadata.image.mime });
+					let urlCreator = window.URL || window.webkitURL;
+					let imageUrl = urlCreator.createObjectURL(blob);
+					$songs[counter].album_art = imageUrl;
+				}
+			});
+		} else {
+			console.log('NO PARSER FOUND');
+		}
+	});
+
 	export let counter = NaN;
 	export let song = {
 		title: 'SONG TITLE',
 		artist: 'SONG ARTIST',
 		album: 'SONG ALBUM',
 		album_art: 'https://dummyimage.com/440/',
+		parsed: false,
 		source: {
 			type: 'audio',
 			sources: [
@@ -15,7 +45,8 @@
 			]
 		}
 	};
-	import { queue, currentStatus } from '../../stores/store';
+
+	import { queue, currentStatus, songs } from '../../stores/store';
 
 	function play(event) {
 		//console.log(event);
@@ -72,7 +103,11 @@
 	<span class="self-center p-2 w-[3rem]">
 		{counter + 1}
 	</span>
-	<img src={song.album_art} alt="Placeholder for Album Art" class="ml-2 rounded-lg h-16 w-16" />
+	<img
+		src={song.album_art}
+		alt="Placeholder for Album Art"
+		class="ml-2 rounded-lg h-16 w-16 object-cover"
+	/>
 	<div class="flex flex-col self-center">
 		<span class="ml-4 w-80 self-center">{song.title}</span>
 		<span class="ml-4 w-80 self-center text-slate-400">{song.album}</span>

@@ -1,4 +1,8 @@
-<script>
+<script context="module">
+	export const ssr = false;
+</script>
+
+<script lang="ts">
 	function navigate_back() {
 		window.history.back();
 	}
@@ -8,12 +12,16 @@
 	//					.replace(/[-]+/g, '-')
 	//					.replace(/[^\w-]+/g, '')}
 
-	import { onMount } from 'svelte';
+	import { onDestroy } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import { goto, prefetch } from '$app/navigation';
 	//import { appWindow } from '@tauri-apps/api/window';
-	import { pageTitle, queue, currentStatus, queueEndedState } from '../../stores/store';
+	import { pageTitle, queue, currentStatus, queueEndedState, songs } from '../../stores/store';
 	import nanobar from 'nanobar';
+	import universalParse from 'id3-parser/lib/universal';
+
+
+
 
 	// Plyr Stuff
 	import { Plyr } from 'svelte-plyr';
@@ -21,7 +29,15 @@
 	let player;
 
 	// Plyr Integration Stuff.
-	let eventsEmitted = ['timeupdate', 'play', 'pause', 'ready', 'progress', 'ended'];
+	let eventsEmitted = [
+		'timeupdate',
+		'play',
+		'pause',
+		'ready',
+		'progress',
+		'ended',
+		'loadedmetadata'
+	];
 	let progressBar;
 
 	function update_handler(status) {
@@ -164,6 +180,27 @@
 		progressBar.go(Number(event.detail.currentTime / event.detail.duration) * 100);
 	}
 
+	// to run on loadedmetadata
+	async function metadata_update(event) {
+		if ($currentStatus.parsed) {
+			return;
+		}
+		//TODO: Add a condition check for MP3
+		const metadata = await universalParse($currentStatus.source.sources[0].src);
+		$currentStatus.parsed = true;
+		$currentStatus.album = metadata.album;
+		$currentStatus.title = metadata.title;
+		$currentStatus.artist = metadata.artist;
+		if (metadata.image) {
+					// @ts-ignore
+					let blob = new Blob([metadata.image.data], { type: metadata.image.mime });
+					let urlCreator = window.URL || window.webkitURL;
+					let imageUrl = urlCreator.createObjectURL(blob);
+					$currentStatus.album_art = imageUrl;
+				}
+		$queue[$currentStatus.queue_position] = Object.assign({}, $currentStatus);
+	}
+
 	// create ProgressBar when the player is ready and only get ready once.
 	let isReady = false;
 	function ready(event) {
@@ -181,29 +218,32 @@
 		if ($currentStatus.queue_position <= 0) {
 			next('');
 			player.pause();
+		} else {
+			player.source = $queue[$currentStatus.queue_position].source;		
 		}
-		//console.log(player.source)
+
 		isReady = true;
 		console.log('%c [plyr] Player Ready ', 'background-color: black; color: green');
 	}
 
 	// Handle clicks for timeskip.
 	function handle_timeskip_click(event) {
+		//console.log(event)
 		let bar = document.getElementById('progress-bar');
 		let x = event.pageX - bar.offsetLeft;
+		//console.log(x)
 		let y = event.pageY - bar.offsetTop;
 		let clickedValue = (x * 1) / bar.offsetWidth;
+		//console.log(clickedValue)
 		//console.table({'x':x, 'y':y, 'value':clickedValue})
 		if (player) {
 			let newDuration = clickedValue * player.duration;
 			player.currentTime = newDuration;
-			//console.log(newDuration, clickedValue, player.duration)
+			//player.forward(newDuration - player.currentTime);
+			//console.log(newDuration,player.currentTime, player)
 		}
 	}
-	// Progress timeskip
-	//function handle_progress(event) {
-	//	console.log(event.detail.buffered);
-	//}
+
 	// Process Volume
 	let volume;
 	function handle_volume_change(volume) {
@@ -222,7 +262,7 @@
 			return;
 		}
 		event.preventDefault();
-		console.log(event);
+		//console.log(event);
 		if (player) {
 			switch (event.key.toLowerCase()) {
 				case 'k':
@@ -254,6 +294,12 @@
 			}
 		}
 	}
+
+	function flush_status() {
+		localStorage.setItem('currentStatus', JSON.stringify($currentStatus).replace(/parsed:true/g, 'parsed:false'));
+		localStorage.setItem('songs', JSON.stringify($songs))
+		localStorage.setItem('queue', JSON.stringify($queue))
+	};
 </script>
 
 <div class="flex flex-col">
@@ -349,7 +395,7 @@
 		</div>
 	</div>
 	<div
-		id="player"
+		id="plyr"
 		class="flex bg-nord2 flex-col content-between self-center w-full h-24 align-middle select-none"
 	>
 		<div id="progress-bar" on:click={handle_timeskip_click}>
@@ -417,7 +463,7 @@
 			<li class="pl-8 pr-4">
 				<span class="max-h-16 max-w-16">
 					<img
-						class="rounded h-20 w-20"
+						class="rounded h-20 w-20 object-cover"
 						src={$currentStatus.album_art || 'https://dummyimage.com/440x440'}
 						alt="Album Art"
 					/>
@@ -492,11 +538,13 @@
 <div class="hidden">
 	<Plyr
 		bind:player
-		on:ready={ready}
 		on:timeupdate={timeupdate}
 		on:play={play}
 		on:pause={pause}
+		on:ready={ready}
+		on:progress={flush_status}
 		on:ended={ended}
+		on:loadedmetadata={metadata_update}
 		eventsToEmit={eventsEmitted}
 	>
 		<audio id="audio" crossorigin="" playsinline>

@@ -1,12 +1,9 @@
-<script context="module">
-	export const ssr = false;
-</script>
-
 <script>
 	import Sortable from 'sortablejs';
 	import { onMount } from 'svelte';
 	import { currentStatus, queue } from '../../stores/store';
 	import QueueListItem from '$lib/ui/QueueListItem.svelte';
+
 	let sortable;
 	onMount(() => {
 		sortable = new Sortable(document.getElementById('queue'), {
@@ -45,7 +42,7 @@
 	id="queue"
 	class="flex flex-wrap content-evenly justify-center w-[92vw] mx-auto py-4 select-none text-nord5"
 >
-	{#each $queue as s, i (s.title + i)}
+	{#each $queue as s, i (Math.random())}
 		<QueueListItem song={s} counter={i} />
 	{:else}
 		<!-- empty list -->
