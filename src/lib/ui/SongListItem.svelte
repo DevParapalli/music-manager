@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import universalParse from 'id3-parser/lib/universal';
+	import universalParse from 'id3-parser/lib/universal/index.js';
 
 	onMount(() => {
 		let src = $songs[counter].source.sources[0].src;

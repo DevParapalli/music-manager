@@ -18,7 +18,7 @@
 	//import { appWindow } from '@tauri-apps/api/window';
 	import { pageTitle, queue, currentStatus, queueEndedState, songs } from '../../stores/store';
 	import nanobar from 'nanobar';
-	import universalParse from 'id3-parser/lib/universal';
+	import universalParse from 'id3-parser/lib/universal/index.js';
 
 
 
