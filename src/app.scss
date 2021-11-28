@@ -3,10 +3,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-	-webkit-overflow-scrolling: touch;
-	-webkit-tap-highlight-color: transparent;
-}
 
 :root {
 	/* Common Directives */
