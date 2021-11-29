@@ -1,6 +1,7 @@
 import { browser, dev } from '$app/env';
 import { writable } from 'svelte/store';
 
+
 export const pageTitle = writable<string>('Music Thingy');
 
 export interface Source {
@@ -12,7 +13,7 @@ export interface Song {
 	title?: string;
 	artist?: string;
 	album?: string;
-	album_art: string;
+	album_art?: string;
 	parsed: boolean;
 	source: {
 		type: string;
@@ -64,7 +65,7 @@ export const queueEndedState = <State>{
 		]
 	},
 	current_time: 0,
-	//queue_position: -1, // Removed so it doesnt override the queue position
+	//queue_position: -1, // Removed so it doesn't override the queue position
 	is_playing: false,
 	update: ''
 };
@@ -256,11 +257,6 @@ if (browser) {
 	if (storedSongs != null) {
 		songs.set(storedSongs);
 	} else {
-		songs.set(sampleSongs);
-	}
-	// TODO: Figure out something to deal with the song queue
-	// Probably a JSON file with filenames ??
-	if (dev) {
 		songs.set(sampleSongs);
 	}
 }

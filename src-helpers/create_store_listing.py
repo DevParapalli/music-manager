@@ -6,6 +6,7 @@ template_for_store = """
 		parsed: false,
 		source: {
 			type: 'audio',
+			type:'static',
 			sources: [
 				{
 					src: '/||filename||',

@@ -25,7 +25,6 @@ const config = {
 		adapter: adapter({
 			pages: 'build',
 			assets: 'build',
-			fallback: 'index.html'
 		}),
 
 		vite: {
@@ -34,6 +33,9 @@ const config = {
 					scss: {
 						additionalData: '@import "src/variables.scss";'
 					}
+				},
+				ssr: {
+					noExternal: true
 				}
 			}
 		}

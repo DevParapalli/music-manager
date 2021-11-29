@@ -2,13 +2,13 @@
 	import { onMount } from 'svelte';
 	import universalParse from 'id3-parser/lib/universal/index.js';
 
-	onMount(() => {
+	onMount(async () => {
 		let src = $songs[counter].source.sources[0].src;
 		let isParsed = $songs[counter].parsed;
 		if (isParsed) {
 			return;
 		}
-		if (src.slice(-3) === 'mp3') {
+		if (src.slice(-3) === 'mp3' || src.includes('blob')) {
 			universalParse(src).then((metadata) => {
 				$songs[counter].parsed = true;
 				$songs[counter].title = metadata.title;

@@ -296,9 +296,9 @@
 	}
 
 	function flush_status() {
-		localStorage.setItem('currentStatus', JSON.stringify($currentStatus).replace(/parsed:true/g, 'parsed:false'));
-		localStorage.setItem('songs', JSON.stringify($songs))
-		localStorage.setItem('queue', JSON.stringify($queue))
+		localStorage.setItem('currentStatus', JSON.stringify($currentStatus).replaceAll('"parsed":true', '"parsed":false'));
+		localStorage.setItem('songs', JSON.stringify($songs).replaceAll('"parsed":true', '"parsed":false'))
+		localStorage.setItem('queue', JSON.stringify($queue).replaceAll('"parsed":true', '"parsed":false'))
 	};
 </script>
 

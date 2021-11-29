@@ -14,7 +14,7 @@
 		"bundle": {
 			"active": true,
 			"targets": "all",
-			"identifier": "com.tauri.dev",
+			"identifier": "com.devparapalli.musicmanager",
 			"icon": [
 				"icons/32x32.png",
 				"icons/128x128.png",
@@ -65,7 +65,7 @@
 			}
 		],
 		"security": {
-			"csp": "default-src blob: data: filesystem: ws: wss: http: https: tauri: 'unsafe-eval' 'unsafe-inline' 'self' img-src: 'self'"
+			"csp": "default-src asset: blob: data: filesystem: ws: wss: http: https: tauri:  'unsafe-eval' 'unsafe-inline' 'self' img-src: 'self'"
 		}
 	}
 }
