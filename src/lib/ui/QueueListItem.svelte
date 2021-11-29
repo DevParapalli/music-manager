@@ -1,10 +1,10 @@
-<script>
+<script lang="ts">
 	export let counter = -1;
-	export let song = {
+	export let song = <Song>{
 		title: 'SONG TITLE',
 		artist: 'SONG ARTIST',
 		album: 'SONG ALBUM',
-		album_art: 'https://dummyimage.com/440/',
+		album_art: '/defaults/default_song_image.svg',
 		source: {
 			type: 'audio',
 			sources: [
@@ -15,7 +15,7 @@
 			]
 		}
 	};
-	import { queue, currentStatus } from '../../stores/store';
+	import { queue, currentStatus, Song } from '../../stores/store';
 	import { onMount } from 'svelte';
 	import universalParse from 'id3-parser/lib/universal/index.js';
 
@@ -75,7 +75,7 @@
 	<img
 		src={song.album_art}
 		alt="Placeholder for Album Art"
-		class="ml-2 rounded-lg h-16 w-16 object-cover"
+		class="ml-2 rounded-lg h-16 w-16 object-cover text-white"
 	/>
 	<div class="flex flex-col self-center">
 		<span class="ml-4 w-80 self-center">{song.title}</span>

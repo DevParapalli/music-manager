@@ -33,7 +33,7 @@ const initialState = <State>{
 	title: 'Load Track to Begin Playback',
 	artist: '',
 	album: '',
-	album_art: 'https://dummyimage.com/440/',
+	album_art: '/defaults/default_song_image.svg',
 	source: {
 		type: 'audio',
 		sources: [

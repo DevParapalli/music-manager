@@ -182,12 +182,11 @@
 
 	// to run on loadedmetadata
 	async function metadata_update(event) {
-		if ($currentStatus.parsed) {
-			return;
-		}
+		//if ($currentStatus.parsed) {
+		//	return;
+		//}
 		//TODO: Add a condition check for MP3
 		const metadata = await universalParse($currentStatus.source.sources[0].src);
-		$currentStatus.parsed = true;
 		$currentStatus.album = metadata.album;
 		$currentStatus.title = metadata.title;
 		$currentStatus.artist = metadata.artist;
@@ -198,6 +197,7 @@
 					let imageUrl = urlCreator.createObjectURL(blob);
 					$currentStatus.album_art = imageUrl;
 				}
+		$currentStatus.parsed = true;
 		$queue[$currentStatus.queue_position] = Object.assign({}, $currentStatus);
 	}
 
@@ -464,7 +464,7 @@
 				<span class="max-h-16 max-w-16">
 					<img
 						class="rounded h-20 w-20 object-cover"
-						src={$currentStatus.album_art || 'https://dummyimage.com/440x440'}
+						src={$currentStatus.album_art || '/defaults/default_album_image.svg'}
 						alt="Album Art"
 					/>
 				</span>

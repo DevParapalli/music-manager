@@ -42,9 +42,9 @@
 	id="queue"
 	class="flex flex-wrap content-evenly justify-center w-[92vw] mx-auto py-4 select-none text-nord5"
 >
-	{#each $queue as s, i (Math.random())}
+	{#each $queue as s, i (s.title+s.artist+s.album+i)}
 		<QueueListItem song={s} counter={i} />
 	{:else}
-		<!-- empty list -->
+	<!--Empty List-->
 	{/each}
 </div>

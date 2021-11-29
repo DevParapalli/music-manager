@@ -29,11 +29,11 @@
 	});
 
 	export let counter = NaN;
-	export let song = {
+	export let song = <Song>{
 		title: 'SONG TITLE',
 		artist: 'SONG ARTIST',
 		album: 'SONG ALBUM',
-		album_art: 'https://dummyimage.com/440/',
+		album_art: '/defaults/default_song_image.svg',
 		parsed: false,
 		source: {
 			type: 'audio',
@@ -46,7 +46,7 @@
 		}
 	};
 
-	import { queue, currentStatus, songs } from '../../stores/store';
+	import { queue, currentStatus, songs, Song } from '../../stores/store';
 
 	function play(event) {
 		//console.log(event);
