@@ -1,32 +1,5 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import universalParse from 'id3-parser/lib/universal/index.js';
-
-	onMount(async () => {
-		let src = $songs[counter].source.sources[0].src;
-		let isParsed = $songs[counter].parsed;
-		if (isParsed) {
-			return;
-		}
-		if (src.slice(-3) === 'mp3' || src.includes('blob')) {
-			universalParse(src).then((metadata) => {
-				$songs[counter].parsed = true;
-				$songs[counter].title = metadata.title;
-				$songs[counter].artist = metadata.artist;
-				$songs[counter].album = metadata.album;
-				//img.src = `data:${picture.format};base64,${picture.data.toString('base64')}`;
-				if (metadata.image) {
-					// @ts-ignore
-					let blob = new Blob([metadata.image.data], { type: metadata.image.mime });
-					let urlCreator = window.URL || window.webkitURL;
-					let imageUrl = urlCreator.createObjectURL(blob);
-					$songs[counter].album_art = imageUrl;
-				}
-			});
-		} else {
-			console.log('NO PARSER FOUND');
-		}
-	});
 
 	export let counter = NaN;
 	export let song = <Song>{

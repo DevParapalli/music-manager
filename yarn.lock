@@ -4508,6 +4508,11 @@ svelte-hmr@^0.14.7:
   resolved "https://registry.yarnpkg.com/svelte-hmr/-/svelte-hmr-0.14.7.tgz#7fa8261c7b225d9409f0a86f3b9ea5c3ca6f6607"
   integrity sha512-pDrzgcWSoMaK6AJkBWkmgIsecW0GChxYZSZieIYfCP0v2oPyx2CYU/zm7TBIcjLVUPP714WxmViE9Thht4etog==
 
+svelte-inview@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/svelte-inview/-/svelte-inview-2.1.1.tgz#a6e2809d57800590672c0a630617d951cb18e1ef"
+  integrity sha512-eEDkcIddA/eYpMl4bDKwop+GP8vjzrxeVAAOlC/lz7FgsrSvJ5hxJGwLT7qwUy9adfXXA2bow/NKVURaOhskag==
+
 svelte-plyr@^0.1.3:
   version "0.1.3"
   resolved "https://registry.yarnpkg.com/svelte-plyr/-/svelte-plyr-0.1.3.tgz#7e364deacf6223f5af90f6ef7b14fbec2e341011"

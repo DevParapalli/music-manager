@@ -91,18 +91,29 @@ def get_file_content(req: Request, file: str):
         return FileResponse(file)
 
 
+def get_image_key(keys):
+    if 'APIC:Cover' in keys:
+        return 'APIC:Cover'
+    for key in keys:
+        if key.startswith('APIC:'):
+            return key
+
+
 @fs_router.get("/file/metadata")
 def get_song_metadata(file: str):
     """Returns metadata if supported by mutagen, else throws error."""
     if os.path.splitext(file)[1].lower() == ".mp3":
         audio = mp3.MP3(file)
-        image_tag = 'APIC:Cover' if 'APIC:Cover' in audio.tags.keys() else 'APIC:cover.jpg'
-
+        image_tag = get_image_key(audio.tags.keys())
+        if image_tag:
+            album_art = f"data:{audio[image_tag].mime};base64,{base64.b64encode(audio[image_tag].data).decode()}"
+        else:
+            album_art = f"/defaults/default_song_image.svg"
         # Read the standards for MP3 ID3 Tags and explanation for below.
         return {
             "content": "fs.file.metadata.mp3",
             "data": {
-                "album_art": f"data:{audio[image_tag].mime};base64,{base64.b64encode(audio[image_tag].data).decode()}",
+                "album_art": album_art,
                 "title": ", ".join(audio["TIT2"].text),
                 "album": ", ".join(audio["TALB"].text),
                 "artist": ", ".join(audio["TPE1"].text),

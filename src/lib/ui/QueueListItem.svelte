@@ -16,34 +16,7 @@
 		}
 	};
 	import { queue, currentStatus, Song } from '../../stores/store';
-	import { onMount } from 'svelte';
-	import universalParse from 'id3-parser/lib/universal/index.js';
 
-	onMount(() => {
-		let src = $queue[counter].source.sources[0].src;
-		let isParsed = $queue[counter].parsed;
-		if (isParsed) {
-			//return;
-		}
-		if (src.slice(-3) === 'mp3') {
-			universalParse(src).then((metadata) => {
-				$queue[counter].parsed = true;
-				$queue[counter].title = metadata.title;
-				$queue[counter].artist = metadata.artist;
-				$queue[counter].album = metadata.album;
-				//img.src = `data:${picture.format};base64,${picture.data.toString('base64')}`;
-				if (metadata.image) {
-					// @ts-ignore
-					let blob = new Blob([metadata.image.data], { type: metadata.image.mime });
-					let urlCreator = window.URL || window.webkitURL;
-					let imageUrl = urlCreator.createObjectURL(blob);
-					$queue[counter].album_art = imageUrl;
-				}
-			});
-		} else {
-			console.log('NO PARSER FOUND');
-		}
-	});
 
 	function play(event) {
 		//console.log(event);
