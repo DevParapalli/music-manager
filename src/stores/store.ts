@@ -10,10 +10,10 @@ export interface Source {
 }
 
 export interface Song {
-	title?: string;
-	artist?: string;
-	album?: string;
-	album_art?: string;
+	title: string;
+	artist: string;
+	album: string;
+	album_art: string;
 	parsed: boolean;
 	source: {
 		type: string;
@@ -259,6 +259,9 @@ if (browser) {
 	} else {
 		songs.set(sampleSongs);
 	}
+	if (dev) {
+		songs.set([]);
+	}
 }
 
 export const queue = writable<Array<Song>>([]);
@@ -273,3 +276,6 @@ if (browser) {
 		queue.set(sampleQueue);
 	}
 }
+
+export const ScanList = writable<Array<string>>([]);
+

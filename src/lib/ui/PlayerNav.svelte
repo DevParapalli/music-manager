@@ -12,10 +12,8 @@
 	//					.replace(/[-]+/g, '-')
 	//					.replace(/[^\w-]+/g, '')}
 
-	import { onDestroy } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import { goto, prefetch } from '$app/navigation';
-	//import { appWindow } from '@tauri-apps/api/window';
 	import { pageTitle, queue, currentStatus, queueEndedState, songs } from '../../stores/store';
 	import nanobar from 'nanobar';
 	import universalParse from 'id3-parser/lib/universal/index.js';
@@ -91,6 +89,9 @@
 
 	// Skip to Next Source
 	function next(event) {
+		if (!player) {
+			return
+		}
 		//console.log(event)
 		$currentStatus.queue_position += 1;
 		if ($currentStatus.queue_position > $queue.length - 1) {
@@ -182,9 +183,9 @@
 
 	// to run on loadedmetadata
 	async function metadata_update(event) {
-		//if ($currentStatus.parsed) {
-		//	return;
-		//}
+		if ($currentStatus.parsed) {
+		return;
+		}
 		//TODO: Add a condition check for MP3
 		const metadata = await universalParse($currentStatus.source.sources[0].src);
 		$currentStatus.album = metadata.album;
