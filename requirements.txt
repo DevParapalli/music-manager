@@ -2,4 +2,5 @@ filetype
 hypercorn[trio]
 fastapi
 mutagen
+pywebview
 aiofiles
