@@ -1,0 +1,5 @@
+filetype
+hypercorn[trio]
+fastapi
+mutagen
+aiofiles
