@@ -4,3 +4,4 @@ fastapi
 mutagen
 pywebview
 aiofiles
+typer

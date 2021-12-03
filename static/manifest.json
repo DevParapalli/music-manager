@@ -1,0 +1,10 @@
+{
+    "name": "Music Thingy",
+    "short_name": "MUSIC",
+    "theme_color": "#2196f3",
+    "background_color": "#2196f3",
+    "display": "minimal-ui",
+    "orientation": "landscape",
+    "scope": "/",
+    "start_url": "/"
+}

@@ -1,5 +1,6 @@
 const typography = require('@tailwindcss/typography');
 const forms = require('@tailwindcss/forms');
+const nord = require('tailwind-nord')
 
 const config = {
 	content: ['./src/**/*.{html,js,svelte,ts}'],
@@ -8,7 +9,7 @@ const config = {
 		extend: {}
 	},
 
-	plugins: [forms, typography]
+	plugins: [forms, typography, nord]
 };
 
 module.exports = config;
